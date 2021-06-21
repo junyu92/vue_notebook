@@ -4,12 +4,12 @@ module.exports = {
   themeConfig: {
     sidebar: [
       {
-        title: 'Kernel',
+        text: 'Kernel',
         children: [
           {
-            title: 'Interrupt',
+            text: 'Interrupt',
             children: [
-              '/kernel/interrupt/its',
+              '/kernel/interrupt/its.md',
             ]
           }
         ]
