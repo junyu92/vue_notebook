@@ -109,11 +109,64 @@ For example,
 
 ## Virtualization
 
+### Model and Data Structures
+
+#### Data structures
+
+* `struct its_device`: a device
+* `struct its_ite`: triple `(eventid, irq, collection)`
+
+#### Helper
+
+* `find_ite` is used to find an interrupt translation table
+  entry (`struct its_ite`) for a given `(Device ID, Event ID)` on
+  an ITS.
+
 ```c
-/**
- * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
- * according to v0 ABI
- */
+static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+                                  u32 event_id)
+{
+        struct its_device *device;
+        struct its_ite *ite;
+
+        device = find_its_device(its, device_id);
+        if (device == NULL)
+                return NULL;
+
+        list_for_each_entry(ite, &device->itt_head, ite_list)
+                if (ite->event_id == event_id)
+                        return ite;
+
+        return NULL;
+}
+```
+
+### API
+
+#### ioctl KVM_DEV_ARM_ITS_CTRL_RESET
+
+```c
+/* virt/kvm/arm/vgic/vgic-its.c */
+
+static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
+{
+        /* We need to keep the ABI specific field values */
+        its->baser_coll_table &= ~GITS_BASER_VALID;
+        its->baser_device_table &= ~GITS_BASER_VALID;
+        its->cbaser = 0;
+        its->creadr = 0;
+        its->cwriter = 0;
+        its->enabled = 0;
+        vgic_its_free_device_list(kvm, its);
+        vgic_its_free_collection_list(kvm, its);
+}
+```
+
+#### ioctl KVM_DEV_ARM_ITS_SAVE_TABLES
+
+Save the ITS tables into guest ARM.
+
+```c
 static int vgic_its_save_tables_v0(struct vgic_its *its)
 {
         int ret;
@@ -123,6 +176,28 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
                 return ret;
 
         return vgic_its_save_collection_table(its);
+}
+```
+
+#### ioctl KVM_DEV_ARM_ITS_RESTORE_TABLES
+
+Restore the ITS tables from guest RAM to internal data
+structs.
+
+```c
+/**
+ * vgic_its_restore_tables_v0 - Restore the ITS tables from guest RAM
+ * to internal data structs according to V0 ABI
+ */
+static int vgic_its_restore_tables_v0(struct vgic_its *its)
+{
+        int ret;
+
+        ret = vgic_its_restore_collection_table(its);
+        if (ret)
+                return ret;
+
+        return vgic_its_restore_device_tables(its);
 }
 ```
 
