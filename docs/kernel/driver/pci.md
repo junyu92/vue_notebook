@@ -1,13 +1,74 @@
 # PCI
 
+[[toc]]
+
 ## PCI Configuration Space
 
-### Base Address Register (BAR)
+PCI configuration space is the underlying way that the *Conventional PCI*,
+*PCI-X* and *PCI Express* perform auto configuration of cards into their
+bus.
+
+### Standardized registers
+
+![PCI Standardized registers](./Pci-config-space.svg)
+
+#### Vendor ID and Device ID
+
+identify the device.
+
+The 16-bit vendor ID is allocated by the *PCI-SIG*. The 16-bit device ID is
+then assigned by the vendor.
+
+> https://pcisig.com/membership/member-companies?combine=&order=field_vendor_id&sort=asc
+
+#### Status
+
+is used to report which features are supported and whether certain kinds of
+errors have occurred.
+
+#### Class Code
+
+This identifies the type of device that this is. There are standard classes
+for every sort of device; video, scsi and so on. The class code for SCSI is
+0x0100.
+
+| Class     | Description                                          |
+| --------- | ---------------------------------------------------- |
+| 0x00      | Devices built before class codes (i.e. pre PCI 2.0)  |
+| 0x01      | Mass storage controller                              |
+| 0x02      | Network controller                                   |
+| 0x03      | Display controller                                   |
+| 0x04      | Multimedia device                                    |
+| 0x05      | Memory Controller                                    |
+| 0x06      | Bridge Device                                        |
+| 0x07      | Simple communications controllers                    |
+| 0x08      | Base system peripherals                              |
+| 0x09      | Inupt devices                                        |
+| 0x0A      | Docking Stations                                     |
+| 0x0B      | Processorts                                          |
+| 0x0C      | Serial bus controllers                               |
+| 0x0D-0xFE | Reserved                                             |
+| 0xFF	    | Misc                                                 |
+
+#### Base Address Register (BAR)
 
 It's used to
 * specify how much memory a device wants to be mapped into main memory
 * after device enumeration, it holds the (base) addresses, where the mapped
   memory block begins
+
+#### Interrupt Line and Interrupt Pin
+
+* Interrupt Line: is used to pass an interrupt handle between the
+  PCI initialisation code, the device's driver and Linux's interrupt
+  handling subsystem. The number written there is meaningless to the
+  the device driver but it allows the interrupt handler to correctly
+  route an interrupt from the PCI device to the correct device driver's
+  interrupt handling code within the Linux operating system.
+* Interrupt Pin: Specifies which interrupt pin the device uses.
+  Where a value of 0x01 is INTA#, 0x02 is INTB#, 0x03 is INTC#,
+  0x04 is INTD#, and 0x00 means the device does not use an interrupt
+  pin.
 
 ### MSI-X capability
 
@@ -1135,3 +1196,4 @@ EXPORT_SYMBOL(pci_irq_vector);
 > Documentation/PCI/pci.txt
 > Documentation/PCI/MSI-HOWTO.txt
 > https://docs.oracle.com/cd/E19683-01/806-5222/6je8fjvhe/index.html#hwovr-fig-23
+> https://en.wikipedia.org/wiki/PCI_configuration_space
