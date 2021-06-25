@@ -346,6 +346,8 @@ static irqreturn_t vfio_msihandler(int irq, void *arg)
 
 Let's ignore the defails of eventfd.
 
+
+
 ::: details
 Here is how the device injects interruption into guest.
 
@@ -367,6 +369,17 @@ Here is how the device injects interruption into guest.
         el[x]_irq
 ```
 :::
+
+## Q&A
+
+* When an interrupt triggered, how the kernel receives `device_id`?
+
+The `device_id` is stored within `struct kvm_kernel_irq_routing_entry`
+(see `kvm_arch_set_irq_inatomic` for more details).
+
+The content of `struct kvm_kernel_irq_routing_entry` was initialized
+within function `kvm_set_routing_entry` which had called by
+`ioctl KVM_SET_GSI_ROUTING`.
 
 ## Reference
 
