@@ -2,7 +2,15 @@
 
 [[toc]]
 
-## PCI Configuration Space
+## Architecture
+
+### Host Bridge
+
+### PCI Bus
+
+### PCI Device
+
+## Type 0 PCI Configuration Space (Non-bridge)
 
 PCI configuration space is the underlying way that the *Conventional PCI*,
 *PCI-X* and *PCI Express* perform auto configuration of cards into their
@@ -21,10 +29,32 @@ then assigned by the vendor.
 
 > https://pcisig.com/membership/member-companies?combine=&order=field_vendor_id&sort=asc
 
+#### Revision ID
+
+the version number of the device
+
 #### Status
 
 is used to report which features are supported and whether certain kinds of
 errors have occurred.
+
+| Bit         | Description               |
+| ----------- | ------------------------- |
+| Bit 15      | Detected Parity Error     |
+| Bit 14      | Signaled System Error     |
+| Bit 13      | Received Master Abort     |
+| Bit 12      | Received Target Abort	  |
+| Bit 11      |	Signaled Target Abort     |
+| Bits [10:9] | DEVSEL Timing             |
+| Bit 8       | Master Data Parity Error  |
+| Bit 7       | Fast Back-to-Back Capable |
+| Bit 6       | Reserved                  |
+| Bit 5       | 66 MHZ Capable            |
+| Bit 4       | Capabilities List         |
+| Bit 3       | Interrupt Status          |
+| Bits [2:0]  | Reserved                  |
+
+#### Command
 
 #### Class Code
 
@@ -50,12 +80,38 @@ for every sort of device; video, scsi and so on. The class code for SCSI is
 | 0x0D-0xFE | Reserved                                             |
 | 0xFF	    | Misc                                                 |
 
+#### Header Type
+
+* bit[7]: 1 represents multi-function device; 0 represents single-function device
+* bits[6:0]: The Header Type register values determine the different layouts of
+  remaining 48 bytes (64-16) of the header, depending on the function of the device.
+  Type 0 for endpoints, Type for Root Complex, switches, and bridges.
+
+#### Cache Line Size
+
+The Cache Line Size register must be programmed before the device is told it
+can use the memory-write-and-invalidate transaction. This should normally match
+the CPU's cache line size, but the correct setting is system dependent. This
+register does not apply to PCI Express.
+
 #### Base Address Register (BAR)
 
 It's used to
 * specify how much memory a device wants to be mapped into main memory
 * after device enumeration, it holds the (base) addresses, where the mapped
   memory block begins
+
+#### Subsystem ID and Subsystem Vendor ID
+
+While the Vendor ID is that of the chipset manufacturer, the Subsystem Vendor
+ID is that of the card manufacturer. The Subsystem ID is assigned by the
+subsystem vendor from the same number space as the Device ID.
+
+#### Expansion ROM Base Address
+
+#### Cap. Pointer
+
+points to a linked list of new capabilities implemented by the device.
 
 #### Interrupt Line and Interrupt Pin
 
@@ -70,6 +126,64 @@ It's used to
   0x04 is INTD#, and 0x00 means the device does not use an interrupt
   pin.
 
+## Type 1 PCI Configuration Space
+
+## MSI and MSI-X
+
+### MSI capability
+
+There are 4 kinds of MSI capabilities:
+
+* 32b Message Address
+* 64b Message Address
+* 32b Message Address and Per-vector Masking
+* 64b Message Address and Per-vector Masking
+
+Registers:
+
+#### Capability ID
+
+should be `0x05`
+
+#### Next Pointer
+
+the address of next capability
+
+#### Message Control
+
+Status
+
+| Bits    | Definition                  |                                     |
+| ------- | --------------------------- | ----------------------------------- |
+| 15:9    | Reserved                    |                                     |
+| 8       | Pre-vector Masking Capable  |                                     |
+| 7       | 64 bit Address Capable      |                                     |
+| 6:4     | Multiple Message Enable     | interrupt count allocated by system |
+| 3:1     | Multiple Message Capable    | max irq num the device can use      |
+| 0       | MSI Enable                  |                                     |
+
+#### Message (Upper) Address
+
+the destination address of the MSI memory write transaction
+
+#### Mask Bits
+
+#### Pending Bits
+
+### MSI-X Table
+
+MSI-X Table contains multiple entries. An entry represents a irq request.
+
+```
++----------------+----------+----------------+----------+
+| Vector Control | Msg Data | Msg Upper Addr | Msg Addr | Entry 0
+| Vector Control | Msg Data | Msg Upper Addr | Msg Addr | Entry 1
+| Vector Control | Msg Data | Msg Upper Addr | Msg Addr | Entry 2
+| ...            | ...      | ...            | ...      | Entry 2
+| Vector Control | Msg Data | Msg Upper Addr | Msg Addr | Entry n-1
++----------------+----------+----------------+----------+
+```
+
 ### MSI-X capability
 
 ```
@@ -80,7 +194,7 @@ It's used to
 |                                PBA Offset                    |  BIR  |
 ```
 
-**MSI-X Control Register**
+#### MSI-X Control Register
 
 * Bits[10:0]: MSI-X Table Size, Encoded as (Table Size - 1)
 * Bit[14]: Function Mask.
@@ -89,7 +203,7 @@ It's used to
     is masked or not
 * Bit[15]: MSI-X Enable
 
-**Table Offset and BIR**
+#### Table Offset and BIR
 
 * Bits[2:0]: Table BAR Indicator Register(BIR), indicates which BAR is
   used to map the MSI-X Table into memory space:
@@ -107,6 +221,10 @@ It's used to
 
 Linux returns the physical address of **MSI-X Table** and maps it to
 virtual address via method `msix_map_region`.
+
+#### PBA Offset and BIR
+
+the address of pending table
 
 
 ## Linux
@@ -1197,3 +1315,4 @@ EXPORT_SYMBOL(pci_irq_vector);
 > Documentation/PCI/MSI-HOWTO.txt
 > https://docs.oracle.com/cd/E19683-01/806-5222/6je8fjvhe/index.html#hwovr-fig-23
 > https://en.wikipedia.org/wiki/PCI_configuration_space
+> https://wiki.osdev.org/PCI
