@@ -2,7 +2,10 @@
 
 ## Introduction
 
-An *Interrupt Translation Service* maps interrupts to INTIDs and
+An ITS is used to route Message Signalled interrupts from devices
+into an LPI injection on the processor.
+
+An **Interrupt Translation Service** maps interrupts to INTIDs and
 redistributors.
 
 New class of interrupts (LPI) via an Interrupt Translation Service (ITS)
@@ -32,32 +35,299 @@ New class of interrupts (LPI) via an Interrupt Translation Service (ITS)
 1. Peripheral sends interrupt as a message to the ITS
    - The message specifies the DeviceID (which peripheral) and
      an EventID (which interrupt from that peripheral)
-2. ITS uses the DeviceID to index into the Device Table
-   - Returns pointer to a peripheral specific Interrupt Translation Table
-3. ITS uses the EventID to index into the Interrupt Translation Table
-   - Returns the INTID and Collection ID
-4. ITS uses the Collection ID to index into the Collection Table
-   - Returns the target Redistributor
-5. ITS forwards interrupt to Redistributor
+2. ITS uses the DeviceID to index into the *Device Table*
+   - Returns pointer to a peripheral specific *Interrupt Translation Table* (ITT)
+3. ITS uses the EventID to index into the *Interrupt Translation Table*
+   - Returns *Interrupt translation entry* (ITE), that describes:
+     - For physical interrupts
+       * The output physical INTID
+       * The *Interrupt collection number*, ICID
+     - For virtual interrupts
+       * The output virtual INTID
+       * the vPEID
+       * A doorbell to use if the vPE is not scheduled
+4. For physical interrupts, ICID selects a *Collection table entry* in the
+   *Collection table* (CT) that describes the target Redistributor, and
+   therefore the target PE, to which the interrupt is routed
+5. For virtual interrupts, in GICv4, the vPEID selects a vPE table entry
+   that describes the Redistributor that is currently hosting the target
+   vPE to which the interrupt is routed
 
-## Term
+## Components
 
-* **ITT**: tranlation table
-* **ITT_entry_size**: the number of bytes per tranlation table entry
-* **Pending Table** (*Linux*):
-  The address of Pending Table is stored in register `GICR_PENDBASER`.
-* **LPI Configuration table** (`prop_table` in Linux):
-  The address of LPI Configuration table is stored in
-  register `GICR_PROPBASER` which specifies the base address of the LPI
-  Configuration table, and the Shareability and Cacheability of
-  accesses to the LPI Configuration table.
+### Configuration table and Pending table
 
-## Message Signalled Interrupts (MSI)
+Configuration table entry bit assignments:
 
-### MSI types
+| Bits | Name     | Function |
+| ---- | -------- | -------- |
+| 7:2  | Priority | The priority of the LPI |
+| 1    |          | RES1     |
+| 0    | Enable   | LPI enable |
 
-* MSI
-* MSI-X
+`GICR_PENDBASER` provides the base address of the LPI Pending table for
+physical LPIs.
+
+Each Redistributor maintains entries in a seperate LPI Pending table
+that indicates the pending state of each LPI when `GICR_CTLR.EnableLPIs == 1`
+in the Redistributor:
+
+* 0: The LPI is not pending
+* 1: The LPI is pending
+
+The following function allocates Global Configuration table and per-CPU
+pending table.
+
+```c
+static int __init allocate_lpi_tables(void)
+{
+        u64 val;
+        int err, cpu;
+
+        /*
+         * If LPIs are enabled while we run this from the boot CPU,
+         * flag the RD tables as pre-allocated if the stars do align.
+         */
+        val = readl_relaxed(gic_data_rdist_rd_base() + GICR_CTLR);
+        if ((val & GICR_CTLR_ENABLE_LPIS) && enabled_lpis_allowed()) {
+                gic_rdists->flags |= (RDIST_FLAGS_RD_TABLES_PREALLOCATED |
+                                      RDIST_FLAGS_PROPBASE_NEEDS_FLUSHING);
+                pr_info("GICv3: Using preallocated redistributor tables\n");
+        }
+
+        err = its_setup_lpi_prop_table();
+        if (err)
+                return err;
+
+        /*
+         * We allocate all the pending tables anyway, as we may have a
+         * mix of RDs that have had LPIs enabled, and some that
+         * don't. We'll free the unused ones as each CPU comes online.
+         */
+        for_each_possible_cpu(cpu) {
+                struct page *pend_page;
+
+                pend_page = its_allocate_pending_table(GFP_NOWAIT);
+                if (!pend_page) {
+                        pr_err("Failed to allocate PENDBASE for CPU%d\n", cpu);
+                        return -ENOMEM;
+                }
+
+                gic_data_rdist_cpu(cpu)->pend_page = pend_page;
+        }
+
+        return 0;
+}
+```
+
+
+### ITS Table
+
+this is initialized via `its_probe_one` and `its_alloc_tables`.
+
+provide information about the type, size and access attributes for the
+architected ITS memory structures.
+
+### The Device table (DeviceID->)
+
+provides a table of **Device table entries**. Each DTE describes a mapping
+between a **DeviceID** and an **ITT base address** that points to the memory that
+the ITS can use to store the translations for the **EventID**.
+
+DTE entries:
+
+| Number of bits | Assignment  | Notes                                               |
+| -------------- | ----------- | --------------------------------------------------- |
+| 1              | Valid       |                                                     |
+| 40             | ITT Address | Basic physical address                              |
+| 5              | ITT Range   | Log2 (EventID width supported by the ITT) minus one |
+
+### The Interrupt translation table (EventID ->)
+
+| Number of bits | Assignment  | Notes                                               |
+| -------------- | ----------- | --------------------------------------------------- |
+| 1              | Valid       |                                                     |
+| 1              | Interrupt_Type | indicates whether the interrupt is phys or virt  |
+| Size of the LPI number space | Interrupt_Number | pINTID or vINTID                 |
+| Size of the LPI number space | Interrupt Number Hypervisor ID |                    |
+| 16             | ICID        | Interrupt Collection ID, for phys interrupts only   |
+| 16             | vPEID       | vPE ID, for virtual interrupt only                  |
+
+### The collection table(CollectID ->)
+
+The *Collection table* (CT) provides a table of *Collection table entries* (CTEs).
+
+| Number of bits | Assignment  | Notes                                               |
+| -------------- | ----------- | --------------------------------------------------- |
+| 1              | Valid       |                                                     |
+| Size of RB base identifier | RDbase |                                              |
+
+### The ITS command interface
+
+The ITS is configured and managed, including establishing a Translation
+Table for each device, via an in memory ring shared between the CPU and
+the ITS controller. The ring is managed via the `GITS_CBASER` register and
+indexed by `GITS_CWRITER` and ``GITS_CREADR` registers.
+
+```
++--------------------+ <- GITS_CBASER
+|                    |
++--------------------+ <- GITS_CREADR
+| unprocessed cmd    |
++--------------------+
+| unprocessed cmd    |
++--------------------+
+| unprocessed cmd    |
++--------------------+ <- GITS_CBASER + GITS_CWRITER
+|                    |
++--------------------+
+|                    |
++--------------------+
+```
+
+A processor adds commands to the shared ring and then updates `GITS_CWRITER`
+to make them visible to the ITS controller.
+
+The ITS controller sequentially processes commands from the ring and then updates
+`GITS_CREADR` to indicate the the processor that the command has been processed.
+
+The size of the table is 64K and initialized within `its_probe_one`.
+
+```c
+        its->cmd_base = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
+                                                get_order(ITS_CMD_QUEUE_SZ));
+
+        baser = (virt_to_phys(its->cmd_base)    |
+                 GITS_CBASER_RaWaWb             |
+                 GITS_CBASER_InnerShareable     |
+                 (ITS_CMD_QUEUE_SZ / SZ_4K - 1) |
+                 GITS_CBASER_VALID);
+
+        gits_write_cbaser(baser, its->base + GITS_CBASER);
+```
+
+Each command has size 32 bytes.
+
+```c
+/*
+ * The ITS command block, which is what the ITS actually parses.
+ */
+struct its_cmd_block {
+        u64     raw_cmd[4];
+};
+```
+
+Writing command in the table via `its_send_single_command`.
+
+```c
+static BUILD_SINGLE_CMD_FUNC(its_send_single_command, its_cmd_builder_t,
+                             struct its_collection, its_build_sync_cmd)
+
+/* Warning, macro hell follows */
+#define BUILD_SINGLE_CMD_FUNC(name, buildtype, synctype, buildfn)       \
+void name(struct its_node *its,                                         \
+          buildtype builder,                                            \
+          struct its_cmd_desc *desc)                                    \
+{                                                                       \
+        struct its_cmd_block *cmd, *sync_cmd, *next_cmd;                \
+        synctype *sync_obj;                                             \
+        unsigned long flags;                                            \
+                                                                        \
+        raw_spin_lock_irqsave(&its->lock, flags);                       \
+                                                                        \
+        cmd = its_allocate_entry(its);                                  \
+        if (!cmd) {             /* We're soooooo screewed... */         \
+                raw_spin_unlock_irqrestore(&its->lock, flags);          \
+                return;                                                 \
+        }                                                               \
+        sync_obj = builder(its, cmd, desc);                             \
+        its_flush_cmd(its, cmd);                                        \
+                                                                        \
+        if (sync_obj) {                                                 \
+                sync_cmd = its_allocate_entry(its);                     \
+                if (!sync_cmd)                                          \
+                        goto post;                                      \
+                                                                        \
+                buildfn(its, sync_cmd, sync_obj);                       \
+                its_flush_cmd(its, sync_cmd);                           \
+        }                                                               \
+                                                                        \
+post:                                                                   \
+        next_cmd = its_post_commands(its);                              \
+        raw_spin_unlock_irqrestore(&its->lock, flags);                  \
+                                                                        \
+        if (its_wait_for_range_completion(its, cmd, next_cmd))          \
+                pr_err_ratelimited("ITS cmd %ps failed\n", builder);    \
+}
+
+static struct its_cmd_block *its_allocate_entry(struct its_node *its)
+{
+        struct its_cmd_block *cmd;
+        u32 count = 1000000;    /* 1s! */
+
+        while (its_queue_full(its)) {
+                count--;
+                if (!count) {
+                        pr_err_ratelimited("ITS queue not draining\n");
+                        return NULL;
+                }
+                cpu_relax();
+                udelay(1);
+        }
+
+        cmd = its->cmd_write++;
+
+        /* Handle queue wrapping */
+        if (its->cmd_write == (its->cmd_base + ITS_CMD_QUEUE_NR_ENTRIES))
+                its->cmd_write = its->cmd_base;
+
+        /* Clear command  */
+        cmd->raw_cmd[0] = 0;
+        cmd->raw_cmd[1] = 0;
+        cmd->raw_cmd[2] = 0;
+        cmd->raw_cmd[3] = 0;
+
+        return cmd;
+}
+
+static struct its_cmd_block *its_post_commands(struct its_node *its)
+{
+        u64 wr = its_cmd_ptr_to_offset(its, its->cmd_write);
+
+        writel_relaxed(wr, its->base + GITS_CWRITER);
+
+        return its->cmd_write;
+}
+```
+
+Commands sent on the ring include
+
+* operational commands
+  * Routing interrupts to processors
+  * Generating interrupts
+  * Clearing the pending state of interrupts
+  * Synchronising the command queue
+* maintenance commands
+  * Map device/collection/processor
+  * Map virtual interrupt
+  * Clean interrupts
+  * Discard interrupts
+
+According to the specification, we have command
+
+* its_send_int
+* its_send_clear
+* its_send_inv
+* its_send_mapd
+* its_send_mapc
+* its_send_mapti
+* its_send_movi
+* its_send_discard
+* its_send_vmapti
+* its_send_vmovi
+* its_send_vmapp
+* its_send_vmovp
+* its_send_vinvall
 
 ## Device Tree Node
 
@@ -123,11 +393,21 @@ For example,
 
 ### Data Structures
 
+#### struct lpi_range
+
 ```c
+struct lpi_range {
+        struct list_head        entry;
+        u32                     base_id;
+        u32                     span;
+};
+
 static LIST_HEAD(lpi_range_list);
 ```
 
 contains ranges of LPIs that are to available to allocate from.
+
+#### struct its_device
 
 ```c
 /*
@@ -149,9 +429,11 @@ struct its_device {
 
 ```c
 struct event_lpi_map {
+        /* map event id to its_vlpi_map */
         unsigned long           *lpi_map;
-        / collection mapping: maps event id to cpu */
+        /* collection mapping: maps event id to cpu */
         u16                     *col_map;
+        /* base hwirq num */
         irq_hw_number_t         lpi_base;
         int                     nr_lpis;
         struct mutex            vlpi_lock;
@@ -1006,7 +1288,117 @@ static void its_cpu_init_collection(struct its_node *its)
 }
 ```
 
+### (un)mask MSI IRQ
+
+```c
+static void its_mask_msi_irq(struct irq_data *d)
+{
+        pci_msi_mask_irq(d);
+        // mask the parent interrupt
+        irq_chip_mask_parent(d);
+}
+
+static void its_unmask_msi_irq(struct irq_data *d)
+{
+        pci_msi_unmask_irq(d);
+        // unmask the parent interrupt
+        irq_chip_unmask_parent(d);
+}
+```
+
+```c
+/**
+ * pci_msi_mask_irq - Generic irq chip callback to mask PCI/MSI interrupts
+ * @data:       pointer to irqdata associated to that interrupt
+ */
+void pci_msi_mask_irq(struct irq_data *data)
+{
+        msi_set_mask_bit(data, 1);
+}
+
+static void msi_set_mask_bit(struct irq_data *data, u32 flag)
+{
+        struct msi_desc *desc = irq_data_get_msi_desc(data);
+
+        if (desc->msi_attrib.is_msix) {
+                msix_mask_irq(desc, flag);
+                readl(desc->mask_base);         /* Flush write to device */
+        } else {
+                unsigned offset = data->irq - desc->irq;
+                msi_mask_irq(desc, 1 << offset, flag << offset);
+        }
+}
+
+// Mask MSI-X irq
+
+/*
+ * This internal function does not flush PCI writes to the device.
+ * All users must ensure that they read from the device before either
+ * assuming that the device state is up to date, or returning out of this
+ * file.  This saves a few milliseconds when initialising devices with lots
+ * of MSI-X interrupts.
+ */
+u32 __pci_msix_desc_mask_irq(struct msi_desc *desc, u32 flag)
+{
+        u32 mask_bits = desc->masked;
+
+        if (pci_msi_ignore_mask)
+                return 0;
+
+        mask_bits &= ~PCI_MSIX_ENTRY_CTRL_MASKBIT;
+        if (flag)
+                mask_bits |= PCI_MSIX_ENTRY_CTRL_MASKBIT;
+        writel(mask_bits, pci_msix_desc_addr(desc) + PCI_MSIX_ENTRY_VECTOR_CTRL);
+
+        return mask_bits;
+}
+
+static void msix_mask_irq(struct msi_desc *desc, u32 flag)
+{
+        desc->masked = __pci_msix_desc_mask_irq(desc, flag);
+}
+
+// Mask MSI irq
+
+/*
+ * PCI 2.3 does not specify mask bits for each MSI interrupt.  Attempting to
+ * mask all MSI interrupts by clearing the MSI enable bit does not work
+ * reliably as devices without an INTx disable bit will then generate a
+ * level IRQ which will never be cleared.
+ */
+u32 __pci_msi_desc_mask_irq(struct msi_desc *desc, u32 mask, u32 flag)
+{
+        u32 mask_bits = desc->masked;
+
+        if (pci_msi_ignore_mask || !desc->msi_attrib.maskbit)
+                return 0;
+
+        mask_bits &= ~mask;
+        mask_bits |= flag;
+        pci_write_config_dword(msi_desc_to_pci_dev(desc), desc->mask_pos,
+                               mask_bits);
+
+        return mask_bits;
+}
+
+static void msi_mask_irq(struct msi_desc *desc, u32 mask, u32 flag)
+{
+        desc->masked = __pci_msi_desc_mask_irq(desc, mask, flag);
+}
+```
+
 ## Virtualization
+
+In GICv3, A **virtual LPI** is generated when the hypervisor writes a
+**vINTID** corresponding to the LPI range, to a List register, in this
+case, the vINTID that has a value greater than 8191.
+
+GICv4 provides support for the direct injection of `vLPI`, in the
+LPI INTID range. With the direct injection of vLPIs, the `GICR_*`
+registers use structures in memory for each `vPE` to hold LPI
+configuration and pending information for vLPIs in the same way
+that they use structures in memory to hold LPI configuration and
+pending information for physical LPIs.
 
 ### Model and Data Structures
 
@@ -1100,8 +1492,21 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
 }
 ```
 
+### Direct injection of virtual interrupts
 
+The ITS maps an EventID and a DeviceID to an INTID associated with a PE,
+see The Interrupt Translation Service on page 5-89 for more information.
+GICv4 introduces the ability to generate a virtual LPI without involving
+the hypervisor.
+
+ITE: (EventID ->)
+
+* *control flag*: indicated that the EventID is associated with a virtual LPI
+* *vPEID*: to index in to the ITS vPE table
+* *A virtual INTID*: indicates which vLPI becomes pending
+* *A physical INTID*
 
 ## Reference
 
 > http://bos.itdks.com/855dbb545f004e9da1c603f3bcc0a917.pdf
+> https://xenbits.xen.org/people/ianc/vits/draftB.html
