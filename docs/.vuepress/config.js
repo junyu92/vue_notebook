@@ -13,6 +13,14 @@ module.exports = {
             ]
           },
           {
+            text: 'Memory',
+            children: [
+              '/kernel/memory/cache.md',
+              '/kernel/memory/arm64_fault.md',
+              '/kernel/memory/virtualization.md'
+            ]
+          },
+          {
             text: 'Driver',
             children: [
               '/kernel/driver/pci.md'
