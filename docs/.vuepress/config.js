@@ -35,15 +35,10 @@ module.exports = {
             ]
           },
           {
-            text: 'Sync',
+            text: 'IPC and Sync',
             children: [
-              '/kernel/sync/wait.md',
-            ]
-          },
-          {
-            text: 'IPC',
-            children: [
-              '/kernel/ipc/eventfd.md',
+              '/kernel/ipc_and_sync/wait.md',
+              '/kernel/ipc_and_sync/eventfd.md',
             ]
           },
           {
