@@ -29,7 +29,7 @@ A pending interrupt is only signaled if both:
 
 ## Virtualization
 
-## Direct injection of virtual interrupts (GICv4)
+### Direct injection of virtual interrupts (GICv4)
 
 GICv4 adds support for the direct injection of virtual LPIs (vLPIs).
 This feature allows software to describe to the ITS how physical
@@ -39,7 +39,7 @@ If the vPE targeted by interrupt is running, the virtual interrupt
 can be forwarded without the need to first enter the hypervisor.
 This can reduce the overhead associated with virtualized interrupts.
 
-### Configuration
+#### Configuration
 
 Registers:
 
@@ -146,7 +146,7 @@ static void its_send_vmapti(struct its_device *dev, u32 id)
 }
 ```
 
-### Scheduled virtual PE
+#### Scheduled virtual PE
 
 Virtual interrupts for the scheduled vPE can be directly injected. If
 the target vPE is not scheduled, the virtual interrupt is recorded as
@@ -159,7 +159,7 @@ the Redistributor registers. This means that the hypervisor must:
 * Update `GICR_VPROPBASER`
 * Update `GICR_VPROPBASER`, setting Valid==1 in the process
 
-### inject interrupts
+#### inject interrupts
 
 When a peripheral writes to `GITS_TRANSLATER`
 1. The ITS uses the DeviceID to select the appropriate entry from the
@@ -183,4 +183,4 @@ When a peripheral writes to `GITS_TRANSLATER`
       door-bell interrupt was provided, the pINTID is forwarded to the physical
       CPU interface.
 
-## Direct injection of virtual Software Generated Interrupts (SGIs)
+### Direct injection of virtual Software Generated Interrupts (SGIs)
