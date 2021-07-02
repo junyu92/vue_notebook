@@ -47,7 +47,7 @@ To reduce the need for TLB maintanance on context switches, the lookups from
 some translation regimes can be associated with an ASID, or with an ASID
 and a VMID.
 
-### ASID
+#### ASID
 
 For stage 1 of a translation regime that can support two VA ranges
 the VMSA can distinguish between Global pages and Process-specific
@@ -67,7 +67,7 @@ ASID.
 
 The significant 16 bits are used to store an ASID.
 
-#### init bitmap
+##### init bitmap
 
 bits of ASID is 8 or 16. Linux uses bitmap to manage ASID allocation.
 
@@ -93,7 +93,7 @@ static int asids_init(void)
 early_initcall(asids_init);
 ```
 
-#### Allocate context for task
+##### Allocate context for task
 
 ```c
 static u64 new_context(struct mm_struct *mm)
@@ -146,7 +146,7 @@ set_asid:
 }
 ```
 
-#### switch asid
+##### switch asid
 
 ```c
 void check_and_switch_context(struct mm_struct *mm, unsigned int cpu)
@@ -210,7 +210,7 @@ switch_mm_fastpath:
 }
 ```
 
-### VMID
+#### VMID
 
 When EL2 is enabled, the VMID identifies the current virtual machine,
 with its own independent ASID space.
