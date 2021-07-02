@@ -1,5 +1,12 @@
 # GIC
 
+[[toc]]
+
+## Affinity
+
+GICv3 uses affinity routing to identify connected PEs and to route
+interrupts to a specific PE or group of PEs.
+
 ## Interrupt prioritization
 
 Prioritization describes the

@@ -1,6 +1,5 @@
 module.exports = {
-  title: 'Hello VuePress',
-  description: 'Just playing around',
+  title: 'Notebook',
   themeConfig: {
     sidebar: [
       {
@@ -80,5 +79,8 @@ module.exports = {
         ]
       },
     ]
-  }
+  },
+  plugins: [
+    '@vuepress/back-to-top',
+  ]
 }
