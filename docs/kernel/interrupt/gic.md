@@ -2,12 +2,144 @@
 
 [[toc]]
 
+## Registers
+
+### Distributor (GICD_*)
+
+### Redistributors (GICR_*)
+
+### CPU interfaces (ICC_*_ELn)
+
+
+## Lift cycle of an interrupt
+
+### Level-sensitive interrupts
+
+For level-sensitive interrupts, a rising edge on the interrupt input
+causes the interrupt to become pending, and the interrupt is held
+asserted **until the peripheral de-asserts the interrupt signal**.
+
+```
++-> Inactive
+|     |
+|     | interrupt source is asserted
+|     V
+|   Pending
+|     |
+|     | ack the irq by reading IAR
+|     V
+|   Active and Pending
+|     |
+|     | peripheral de-asserts the interrupt signal.
+|     | software writing to a status register in the periphsral.
+|     V
+|   Active
+|     |
+|     | writing to EOIR
++-----+
+```
+
+### Edge-sensitive interrupts
+
+For edge-sensitive interrupts, a rising edge on the interrupt input
+causes the interrupt to become pending, **but the interrupt is not held asserted**.
+
+```
+    Inactive
+      |
+      | interrupt source is asserted
+      V
++-> Pending
+|     |
+|     | ack the irq by reading IAR
+|     V
+|   Active
+|     |
+|     | (Option) peripheral re-asserts the interrupt signal.
+|     V
+|   (Option) Active and pending
+|     |
+|     | writing to EOIR and GIC re-asserts the interrupt signal
++-----+
+```
+
+### End of interrupt
+
+Once the interrupt has been handled, software must inform the
+interrupt controller that the interrupt has been handled, so
+that the state machine can transition to the next state.
+
+**GICv3 treats this as two tasks**
+* Priority drop
+* Deactivation
+
+In the GICv3 architecture, priority drop and deactivation can happen
+together or separately. This is determined by the settings of
+`ICC_CTLR_ELn.EOImode`:
+
+* EOImode == 0: A write to `ICC_EOIR0_EL1` for Group 0 interrupts,
+                or `ICC_EOIR1_EL1` for Group 1 interrupts, performs
+                both the priority drop and deactivation.
+* EOImode == 1: A write to `ICC_EOIR0_EL1` for Group interrupts, or
+                `ICC_EOIR1_EL1` for Group 1 interrupts results in a
+                priority drop. A seperate write to `ICC_DIR_EL1` is
+                required for deactivation. This mode is often used for
+                virtualization purposes.
+
+
 ## Affinity
 
 GICv3 uses affinity routing to identify connected PEs and to route
-interrupts to a specific PE or group of PEs.
+interrupts to **a specific PE or group of PEs**.
+
+An affinity is a 32-bit value that is split into four fields:
+
+```
+<affinity level 3>.<affinity level 2>.<affinity level 1>.<affinity level 0>
+```
+
+At affinity level 0 there is a Redistributor.
+
+The affinity of a PE is reported in `MPIDR_EL1`.
+
+```c
+static u64 gic_mpidr_to_affinity(unsigned long mpidr)
+{
+        u64 aff;
+
+        aff = ((u64)MPIDR_AFFINITY_LEVEL(mpidr, 3) << 32 |
+               MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
+               MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8  |
+               MPIDR_AFFINITY_LEVEL(mpidr, 0));
+
+        return aff;
+}
+```
+
+Router information stored in `GICD_IROUTER` register.
+
+The SPI can be delivered to any connected PE that is participating in
+distribution of the interrupt group when
+`GICD_IROUTERn.Interrupt_Routing_Mode == 1`.
+
+The Distributor, rather than software, selects the target PE. The target
+can therefore vary each time the interrupt is signaled. This type of
+routing is referred to as 1-of-N.
+
+```c
+gic_write_irouter(affinity, base + GICD_IROUTER + irqnr * 8);
+```
+
 
 ## Interrupt prioritization
+
+The Priority Mask register sets the minimum priority that an interrupt
+must have to be forwarded to the PE.
+
+When a PE acknowledges an interrupt, its running priority becomes the
+same as the priority of the interrupt. The running priority returns
+to its former value when the PE writes to one of the End of Interrupt(EOI)
+registers.
 
 Prioritization describes the
 
@@ -19,7 +151,20 @@ Prioritization describes the
   * Priority grouping
   * Preemption of an active interrupt
 
-Priority values are an 8-bit unsigned binary number.
+Priority values are an 8-bit unsigned binary number. 0x00 is the highest
+possible priority, and 0xFF is the lowest possible priority
+
+```c
+static void gic_irq_set_prio(struct irq_data *d, u8 prio)
+{
+        void __iomem *base = gic_dist_base(d);
+        u32 offset, index;
+
+        offset = convert_offset_index(d, GICD_IPRIORITYR, &index);
+
+        writeb_relaxed(prio, base + offset + index);
+}
+```
 
 ### Preemption
 
@@ -32,6 +177,13 @@ A pending interrupt is only signaled if both:
   interface
 * Its group prioirty is higher than of the running priority on
   the CPU interface
+
+![Preemption](./preemption.png)
+
+The Arm CoreLink GICv3 architecture allows software to control
+preemption by specifying the difference in priority required
+for preemption to occur. This is controlled through the Binary
+Point registers: `ICC_BPRn_EL1`.
 
 
 ## Virtualization
