@@ -51,7 +51,7 @@ module.exports = {
             children: [
               '/kernel/trace/kprobes.md',
               '/kernel/trace/walk_stack_on_arm.md',
-              '/kernel/trace/aarch64_self-hosted_debug.md',
+              '/kernel/trace/aarch64_debug.md',
             ]
           },
           {
