@@ -47,9 +47,11 @@ module.exports = {
             ]
           },
           {
-            text: 'trace',
+            text: 'Trace',
             children: [
-              '/kernel/trace/kprobes.md'
+              '/kernel/trace/kprobes.md',
+              '/kernel/trace/walk_stack_on_arm.md',
+              '/kernel/trace/aarch64_self-hosted_debug.md',
             ]
           },
           {
@@ -69,7 +71,7 @@ module.exports = {
       {
         text: 'Debug',
         children: [
-          '/debug/gdb_python.md'
+          '/debug/gdb_python.md',
         ]
       },
       {
