@@ -1,14 +1,86 @@
 # Cache
 
-A cache is a block of high-speed memory that contains a number
-of entries, each consisting of:
-* Main memory address information, commonly known as a **tag**
-* The associated data
+## Introduction
 
-Cache introduce a number of potential problems, mainly because:
-* Memory accesses can occur at times other than when the
-  programmer would expect them
-* A data item can be held in multiple physical locations
+A cache is a small, fast block of memory that sits between
+the core and main memory. It holds copies of items in main memory.
+
+Accesses to the cache memory occur significantly faster than those
+to main memory. Whenever the core reads or writes a particular address,
+it first looks for it in the cache.
+
+If it finds the address in the cache, it uses the data in the cache,
+rather than performing an access to main memory. This significantly
+increases the potential performance of the system, by reducing the
+effect of slow external memory access times. It also reduces the
+power consumption of the system, by avoiding the need to drive
+external signals.
+
+Processors that implement the ARMv8-A Architecture are usually
+implemented with two or more levels of cache.
+
+This typically means that the processor has small
+**L1 Instruction and Data caches** for **each core**.
+
+The Cortex-A53 and Cortex-A57 processors are normally implemented
+with two or more levels of cache, that is a small L1 Instruction
+and Data cache and a larger, **unified L2 cache**, which is
+**shared between multiple cores in a cluster**.
+
+Additionally, there can be an **external L3 cache** as an external
+hardware block, **shared between clusters**.
+
+
+## D-cache and I-cache
+
+In a von Neumann architecture, a single cache is used for instruction
+and data (a unified cache). A modified Harvard architecture has separate
+instruction and data buses and therefore there are two caches, an
+instruction cache (I-cache) and a data cache (D-cache).
+
+In the ARMv8 processors, there are distinct instruction and data L1
+caches backed by a unified L2 cache.
+
+
+## Fundamental structure of a cache
+
+![CacheTerminology](./cache_terminology.png)
+
+* A **tag** is the part of a memory address stored within the cache that
+  identifies the main memory addr associated with a line of data
+* **cache line** refers to the smallest loadable unit of a cache, a block
+  of contiguous words from main memory
+* A **way** is a subdivision of a cache, each way being of equal size and
+  indexed in the same fashion.
+* A **set** consists of the cache lines from all ways sharing a particular
+  index
+
+
+## Inclusive cache and Exclusive cache
+
+In an **inclusive cache model**, where the same data can be present
+in both the L1 and L2 caches.
+
+In an **exclusive cache**, data can be present in only one cache and
+an address cannot be found in both the L1 and L2 caches at the same time.
+
+
+## Cache policies
+
+The cache policies enable us to describe when a line should be allocated
+to the data cache and what should happen when a store instruction is
+executed that hits in the data cache.
+
+### Cache allocation policies
+
+* Write allocation
+* Read allocation
+
+### Cache update policies
+
+* Write-back
+* Write-through
+
 
 ## The cacheability and Shareability memory attributes
 
@@ -38,6 +110,7 @@ A Normal memory location has a Shareability attribute that is one of:
 * Outer Shareable, meaning it applies across both the Inner Shareable
   and the Outer Shareable shareability domains.
 * Non-shareable
+
 
 ## TLB
 
@@ -222,7 +295,9 @@ with its own independent ASID space.
 * Point of Persistence (PoP)
 * Point of Persistence (PoDP)
 
-## flush operations
+
+
+## Cache maintenance
 
 * Clean: causes the contents of the cache line to be writtern back
   to memory, but only if the cache line is 'dirty'
@@ -236,14 +311,11 @@ with its own independent ASID space.
 ### flush icache
 
 `__flush_icache_range` and `__flush_cache_user_range` are used to
-flush
-
-```c
-```
+flush icache.
 
 ### flush dcache
 
-`__flush_dcache_area` clean and invalidate cache (kaddr, size)
+`__flush_dcache_area` clean and invalidate cache (kaddr, size).
 
 ```c
 /*
@@ -260,3 +332,11 @@ ENTRY(__flush_dcache_area)
         ret
 ENDPIPROC(__flush_dcache_area)
 ```
+
+
+## Cache Coherency
+
+Cache introduce a number of potential problems, mainly because:
+* Memory accesses can occur at times other than when the
+  programmer would expect them
+* A data item can be held in multiple physical locations
