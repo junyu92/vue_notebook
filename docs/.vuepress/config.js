@@ -14,6 +14,7 @@ module.exports = {
           {
             text: 'Memory',
             children: [
+              '/kernel/memory/memory_order.md',
               '/kernel/memory/cache.md',
               '/kernel/memory/arm64_fault.md',
               '/kernel/memory/virtualization.md'
@@ -49,9 +50,12 @@ module.exports = {
           {
             text: 'Trace',
             children: [
+              '/kernel/trace/lockup.md',
               '/kernel/trace/kprobes.md',
               '/kernel/trace/walk_stack_on_arm.md',
               '/kernel/trace/aarch64_debug.md',
+              '/kernel/trace/pmu.md',
+              '/kernel/trace/spe.md',
             ]
           },
           {
@@ -64,6 +68,7 @@ module.exports = {
             text: 'Virtualization',
             children: [
               '/kernel/virtualization/vfio.md',
+              '/kernel/virtualization/secure_virt.md',
             ]
           },
         ]

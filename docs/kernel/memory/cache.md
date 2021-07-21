@@ -82,34 +82,65 @@ executed that hits in the data cache.
 * Write-through
 
 
-## The cacheability and Shareability memory attributes
+## Shareability memory attributes
 
-* **Cacheability** defines weather memory locations are allowed to be
-  allocated into a cache or not
-  * Inner Cacheability
-  * Outer Cacheability
-* **Shareability** defines whether memory locations are shareable between
-  agents in a system
+Memory caching can be separately controlled through *inner* and *outer*
+attributes, for multiple levels of cache.
 
-### Cacheability attributes for Normal memory
+The shareable attribute is used to define **whether a location is shared**
+**with multiple cores**.
 
-Cacheability only applies to Normal memory, and can be defined independently
-for Inner and Outer cache locations. All types of Device memory are always
-treated as Non-cacheable.
+Marking a region an **Non-shareable** means it is only used by thie core,
+whereas marking it as **inner shareable** or **outer shareable**, or both, means
+that the location is shared with other observers, for example, a GPU or
+DMA device might be considered another observer.
 
-* Write-Through Cacheable
-* Write-Back Cacheable
-* Non-cacheable
-
-### Shareable Normal memory
-
-A Normal memory location has a Shareability attribute that is one of:
-
-* Inner Shareable, meaning it applies across the Inner Shareable
-  shareability domain
-* Outer Shareable, meaning it applies across both the Inner Shareable
-  and the Outer Shareable shareability domains.
 * Non-shareable
+
+This represents memory accessible only by a single processor or other
+agent, so memory accesses never need to be synchronized with other
+processors. This domain is not typically used in SMP systems.
+
+* Inner shareable
+
+This represents a shareability domain that can be **shared by multiple**
+**processors**, but not necessarily all of the agents in the system.
+
+A system might have multiple Inner Shareable domains. An operation that
+affacts one Inner Shareable domain does not affect other Inner Shareable
+domains in the system.
+
+* Outer shareable
+
+An outer shareable domain re-orderis shared by multiple agents and
+can consist of one or more inner shareable domains. An operation
+that affects an outer shareable domain also implicity affects all
+inner shareable domains inside it.
+
+Howevert, it does not otherwise behave as an inner shareable operation.
+
+* Full system
+
+An operation on the full system (SY) affects all observers in the system.
+
+
+## Cache Coherency
+
+Cache introduce a number of potential problems, mainly because:
+* Memory accesses can occur at times other than when the
+  programmer would expect them
+* A data item can be held in multiple physical locations
+
+
+### MESI protocol
+
+Cache line can be marked with one of
+
+* M(modified): present only in the current cache, and is dirty.
+* E(exclusive): present only in the current cache, but is clean.
+* S(shared): indicates that this cache line may be stored in other caches
+  of the machine and is clean.
+* I(invalid): indicates that this cache line is invalid.
 
 
 ## TLB
@@ -332,11 +363,3 @@ ENTRY(__flush_dcache_area)
         ret
 ENDPIPROC(__flush_dcache_area)
 ```
-
-
-## Cache Coherency
-
-Cache introduce a number of potential problems, mainly because:
-* Memory accesses can occur at times other than when the
-  programmer would expect them
-* A data item can be held in multiple physical locations
