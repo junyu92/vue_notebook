@@ -16,6 +16,7 @@ module.exports = {
             children: [
               '/kernel/memory/memory_order.md',
               '/kernel/memory/cache.md',
+              '/kernel/memory/memory_tagging_extension.md',
               '/kernel/memory/arm64_fault.md',
               '/kernel/memory/virtualization.md'
             ]
