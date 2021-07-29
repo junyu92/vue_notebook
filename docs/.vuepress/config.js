@@ -1,5 +1,6 @@
 module.exports = {
   title: 'Notebook',
+  base: 'vue_notebook',
   themeConfig: {
     sidebar: [
       {
