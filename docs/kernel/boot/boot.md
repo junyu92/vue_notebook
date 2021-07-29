@@ -399,14 +399,113 @@ translation regime.
 ENDPROC(__cpu_setup)
 ```
 
-## __create_page_tables
+## create page tables
 
 `__create_page_tables` creates initial page tables.
 
+There are many kinds of page tables:
+
+* `idmap_pg_dir` identity mapping, va = pa, will be saved in `ttbr0_el1`
+* `init_pg_dir`, will be saved in `ttbr1_el1`. This page table will be freed in
+  `paging_init` function.
+* `swapper_pg_dir`
+
+Why we need idmap:
+
+> If the PA of the software that enables or disables a particular stage
+  of address translation differs from its VA, speculative instruction
+  fetching can cause complications. ARM strongly recommends that the PA
+  and VA of any software that enables or disables a stage of address
+  translation are identical if that stage of translation controls translations
+  that apply to the software currently being executed.
+
+
+### compute_indices
+
+::: warning
+The comment of code is not correct.
+:::
+
+return value:
+
+istart = (vstart>>shift) & (ptrs-1), the index of page table to vstart.
+iend = ((vend>>shift) & (ptrs-1)) + (count * ptrs), the index of page table to vend.
+count = how many extra entries required for next page table level.
+
+```c
+/*
+ * Compute indices of table entries from virtual address range. If multiple entries
+ * were needed in the previous page table level then the next page table level is assumed
+ * to be composed of multiple pages. (This effectively scales the end index).
+ *
+ *      vstart: virtual address of start of range
+ *      vend:   virtual address of end of range
+ *      shift:  shift used to transform virtual address into index
+ *      ptrs:   number of entries in page table
+ *      istart: index in table corresponding to vstart
+ *      iend:   index in table corresponding to vend
+ *      count:  On entry: how many extra entries were required in previous level, scales
+ *                        our end index.
+ *              On exit: returns how many extra entries required for next page table level
+ *
+ * Preserves:   vstart, vend, shift, ptrs
+ * Returns:     istart, iend, count
+ */
+        .macro compute_indices, vstart, vend, shift, ptrs, istart, iend, count
+        lsr     \iend, \vend, \shift
+        mov     \istart, \ptrs
+        sub     \istart, \istart, #1
+        and     \iend, \iend, \istart   // iend = (vend >> shift) & (ptrs - 1)
+        mov     \istart, \ptrs
+        mul     \istart, \istart, \count
+        add     \iend, \iend, \istart   // iend += (count - 1) * ptrs
+                                        // our entries span multiple tables
+
+        lsr     \istart, \vstart, \shift
+        mov     \count, \ptrs
+        sub     \count, \count, #1
+        and     \istart, \istart, \count
+
+        sub     \count, \iend, \istart
+        .endm
+```
+
+### populate page table
+
+The function allocates `eindex-index` the next level page tables (which is a page)
+and fills page table entries.
+
+```c
+*
+ * Macro to populate page table entries, these entries can be pointers to the next level
+ * or last level entries pointing to physical memory.
+ *
+ *      tbl:    page table address
+ *      rtbl:   pointer to page table or physical memory
+ *      index:  start index to write
+ *      eindex: end index to write - [index, eindex] written to
+ *      flags:  flags for pagetable entry to or in
+ *      inc:    increment to rtbl between each entry
+ *      tmp1:   temporary variable
+ *
+ * Preserves:   tbl, eindex, flags, inc
+ * Corrupts:    index, tmp1
+ * Returns:     rtbl
+ */
+        .macro populate_entries, tbl, rtbl, index, eindex, flags, inc, tmp1
+.Lpe\@: phys_to_pte \tmp1, \rtbl
+        orr     \tmp1, \tmp1, \flags    // tmp1 = table entry
+        str     \tmp1, [\tbl, \index, lsl #3]
+        add     \rtbl, \rtbl, \inc      // rtbl = pa next level
+        add     \index, \index, #1
+        cmp     \index, \eindex
+        b.ls    .Lpe\@
+        .endm
+```
+
 ### map_memory
 
-Before we dive into `__create_page_tables`, we should take a look at `map_memory`
-which maps `[vstart, vend]` to `[phys, vend-vstart+phys]`.
+`map_memory` maps `[vstart, vend]` to `[phys, vend-vstart+phys]`.
 
 ```c
 /*
@@ -449,11 +548,19 @@ which maps `[vstart, vend]` to `[phys, vend-vstart+phys]`.
 #endif
 
         compute_indices \vstart, \vend, #SWAPPER_BLOCK_SHIFT, #PTRS_PER_PTE, \istart, \iend, \count
+        // mask physical address with (#SWAPPER_BLOCK_SIZE - 1) and store in count
         bic \count, \phys, #SWAPPER_BLOCK_SIZE - 1
         populate_entries \tbl, \count, \istart, \iend, \flags, #SWAPPER_BLOCK_SIZE, \tmp
 ```
 
 ### __create_page_tables
+
+`__create_page_tables` creates two mapping:
+
+1. `[__idmap_text_start, __idmap_text_end]` to `[__idmap_text_start, __idmap_text_end]`
+   in page table `idmap_pg_dir`
+2. `[KIMAGE_VADDR + TEXT_OFFSET + kaslr, KIMAGE_VADDR + TEXT_OFFSET + kaslr + _end - _text]`
+   to `[_text, _end]` in page table `init_pg_dir`
 
 ```
 __create_page_tables:
@@ -496,7 +603,9 @@ invalidate dcache from `init_pg_dir` to `init_pg_end`.
 zero out from `init_pg_dir` to `init_pg_end`. It's a loop,
 each iteration clear 64bytes.
 
-```
+Now we are goint to create page tables.
+
+```c
         mov     x7, SWAPPER_MM_MMUFLAGS
 
         /*
@@ -505,6 +614,8 @@ each iteration clear 64bytes.
         adrp    x0, idmap_pg_dir
         adrp    x3, __idmap_text_start          // __pa(__idmap_text_start)
 ```
+
+The following code handles va bit extension
 
 ```
 #ifdef CONFIG_ARM64_VA_BITS_52
@@ -519,6 +630,195 @@ each iteration clear 64bytes.
         str     x5, [x6]
         dmb     sy
         dc      ivac, x6                // Invalidate potentially stale cache line
+
+        /*
+         * VA_BITS may be too small to allow for an ID mapping to be created
+         * that covers system RAM if that is located sufficiently high in the
+         * physical address space. So for the ID map, use an extended virtual
+         * range in that case, and configure an additional translation level
+         * if needed.
+         *
+         * Calculate the maximum allowed value for TCR_EL1.T0SZ so that the
+         * entire ID map region can be mapped. As T0SZ == (64 - #bits used),
+         * this number conveniently equals the number of leading zeroes in
+         * the physical address of __idmap_text_end.
+         */
+        adrp    x5, __idmap_text_end
+        clz     x5, x5
+        cmp     x5, TCR_T0SZ(VA_BITS)   // default T0SZ small enough?
+        b.ge    1f                      // .. then skip VA range extension
+
+        adr_l   x6, idmap_t0sz
+        str     x5, [x6]
+        dmb     sy
+        dc      ivac, x6                // Invalidate potentially stale cache line
+
+#if (VA_BITS < 48)
+#define EXTRA_SHIFT     (PGDIR_SHIFT + PAGE_SHIFT - 3)
+#define EXTRA_PTRS      (1 << (PHYS_MASK_SHIFT - EXTRA_SHIFT))
+
+        /*
+         * If VA_BITS < 48, we have to configure an additional table level.
+         * First, we have to verify our assumption that the current value of
+         * VA_BITS was chosen such that all translation levels are fully
+         * utilised, and that lowering T0SZ will always result in an additional
+         * translation level to be configured.
+         */
+#if VA_BITS != EXTRA_SHIFT
+#error "Mismatch between VA_BITS and page size/number of translation levels"
+#endif
+
+        mov     x4, EXTRA_PTRS
+        create_table_entry x0, x3, EXTRA_SHIFT, x4, x5, x6
+#else
+        /*
+         * If VA_BITS == 48, we don't have to configure an additional
+         * translation level, but the top-level table has more entries.
+         */
+        mov     x4, #1 << (PHYS_MASK_SHIFT - PGDIR_SHIFT)
+        str_l   x4, idmap_ptrs_per_pgd, x5
+#endif
 ```
 
-compute the VA bits and save in `vabits_actual`.
+```c
+1:
+        ldr_l   x4, idmap_ptrs_per_pgd
+        mov     x5, x3                          // __pa(__idmap_text_start)
+        adr_l   x6, __idmap_text_end            // __pa(__idmap_text_end)
+
+        map_memory x0, x1, x3, x6, x7, x3, x4, x10, x11, x12, x13, x14
+```
+
+Mapping kernel image in `init_pg_dir` page table.
+
+```c
+        /*
+         * Map the kernel image (starting with PHYS_OFFSET).
+         */
+        adrp    x0, init_pg_dir
+        mov_q   x5, KIMAGE_VADDR + TEXT_OFFSET  // compile time __va(_text)
+        add     x5, x5, x23                     // add KASLR displacement
+        mov     x4, PTRS_PER_PGD
+        adrp    x6, _end                        // runtime __pa(_end)
+        adrp    x3, _text                       // runtime __pa(_text)
+        sub     x6, x6, x3                      // _end - _text
+        add     x6, x6, x5                      // runtime __va(_end)
+
+        map_memory x0, x1, x5, x6, x7, x3, x4, x10, x11, x12, x13, x14
+```
+
+flushing `[idmap_pg_dir, init_pg_end]`.
+
+```c
+        /*
+         * Since the page tables have been populated with non-cacheable
+         * accesses (MMU disabled), invalidate the idmap and swapper page
+         * tables again to remove any speculatively loaded cache lines.
+         */
+        adrp    x0, idmap_pg_dir
+        adrp    x1, init_pg_end
+        sub     x1, x1, x0
+        dmb     sy
+        bl      __inval_dcache_area
+
+        ret     x28
+ENDPROC(__create_page_tables)
+```
+
+## __primary_switch
+
+::: warning
+We removed some code related to kaslr, see KASLR chapter for more details.
+:::
+
+This function enables mmu and jump to `__primary_switched`.
+
+```c
+__primary_switch:
+        adrp    x1, init_pg_dir
+        bl      __enable_mmu
+
+        ldr     x8, =__primary_switched
+        adrp    x0, __PHYS_OFFSET
+        br      x8
+ENDPROC(__primary_switch)
+```
+
+## __primary_switched
+
+::: warning
+We removed some code related to kaslr, see KASLR chapter for more details.
+:::
+
+```c
+__primary_switched:
+        adrp    x4, init_thread_union
+        add     sp, x4, #THREAD_SIZE
+```
+
+points current `SP` to `init_thread_union + #THREAD_SIZE`.
+
+```c
+        adr_l   x5, init_task
+        msr     sp_el0, x5                      // Save thread_info
+```
+
+`sp_el0` points to `init_task`.
+
+```c
+        adr_l   x8, vectors                     // load VBAR_EL1 with virtual
+        msr     vbar_el1, x8                    // vector table address
+        isb
+```
+
+setup exception vectors (see kernel/entry.S).
+
+```c
+        stp     xzr, x30, [sp, #-16]!
+        mov     x29, sp
+```
+
+```c
+        str_l   x21, __fdt_pointer, x5          // Save FDT pointer
+```
+
+Save the addres of dbt into `__fdt_pointer` for `kaslr_early_init`, we ignore it here.
+
+```c
+        ldr_l   x4, kimage_vaddr                // Save the offset between
+        sub     x4, x4, x0                      // the kernel virtual and
+        str_l   x4, kimage_voffset, x5          // physical mappings
+```
+
+save `kimage_vaddr - __PHYS_OFFSET` into `kimage_voffset`. The offset between
+the kernel virtual and physical mappings. Used to translate virtual to physical addresses.
+
+See `Documentation/admin-guide/kdump/vmcoreinfo.rst`.
+
+```c
+        // Clear BSS
+        adr_l   x0, __bss_start
+        mov     x1, xzr
+        adr_l   x2, __bss_stop
+        sub     x2, x2, x0
+        bl      __pi_memset
+        dsb     ishst                           // Make zero page visible to PTW
+```
+
+clears bss section.
+
+```c
+        add     sp, sp, #16
+        mov     x29, #0
+        mov     x30, #0
+        b       start_kernel
+ENDPROC(__primary_switched)
+```
+
+jumps to `start_kernel`.
+
+## Reference
+
+> https://evsio0n.com/archives/316/
+> http://gngshn.github.io/2017/11/30/arm64-linux启动流程分析08-正式跳入内核空间虚拟地址段运行/
+> Documentation/admin-guide/kdump/vmcoreinfo.rst
