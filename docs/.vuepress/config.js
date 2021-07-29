@@ -7,9 +7,9 @@ module.exports = {
         text: 'Kernel',
         children: [
           {
-            text: 'boot',
+            text: 'Booting and Initialization',
             children: [
-              '/kernel/boot/boot.md',
+              '/kernel/boot/head.md',
               '/kernel/boot/kaslr.md',
             ]
           },
