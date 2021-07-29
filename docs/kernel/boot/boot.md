@@ -820,5 +820,7 @@ jumps to `start_kernel`.
 ## Reference
 
 > https://evsio0n.com/archives/316/
+
 > http://gngshn.github.io/2017/11/30/arm64-linux启动流程分析08-正式跳入内核空间虚拟地址段运行/
+
 > Documentation/admin-guide/kdump/vmcoreinfo.rst
