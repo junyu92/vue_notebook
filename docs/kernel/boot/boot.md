@@ -398,3 +398,127 @@ translation regime.
         ret                                     // return to head.S
 ENDPROC(__cpu_setup)
 ```
+
+## __create_page_tables
+
+`__create_page_tables` creates initial page tables.
+
+### map_memory
+
+Before we dive into `__create_page_tables`, we should take a look at `map_memory`
+which maps `[vstart, vend]` to `[phys, vend-vstart+phys]`.
+
+```c
+/*
+ * Map memory for specified virtual address range. Each level of page table needed supports
+ * multiple entries. If a level requires n entries the next page table level is assumed to be
+ * formed from n pages.
+ *
+ *      tbl:    location of page table
+ *      rtbl:   address to be used for first level page table entry (typically tbl + PAGE_SIZE)
+ *      vstart: start address to map
+ *      vend:   end address to map - we map [vstart, vend]
+ *      flags:  flags to use to map last level entries
+ *      phys:   physical address corresponding to vstart - physical memory is contiguous
+ *      pgds:   the number of pgd entries
+ *
+ * Temporaries: istart, iend, tmp, count, sv - these need to be different registers
+ * Preserves:   vstart, vend, flags
+ * Corrupts:    tbl, rtbl, istart, iend, tmp, count, sv
+ */
+        .macro map_memory, tbl, rtbl, vstart, vend, flags, phys, pgds, istart, iend, tmp, count, sv
+        add \rtbl, \tbl, #PAGE_SIZE
+        mov \sv, \rtbl
+        mov \count, #0
+        compute_indices \vstart, \vend, #PGDIR_SHIFT, \pgds, \istart, \iend, \count
+        populate_entries \tbl, \rtbl, \istart, \iend, #PMD_TYPE_TABLE, #PAGE_SIZE, \tmp
+        mov \tbl, \sv
+        mov \sv, \rtbl
+
+#if SWAPPER_PGTABLE_LEVELS > 3
+        compute_indices \vstart, \vend, #PUD_SHIFT, #PTRS_PER_PUD, \istart, \iend, \count
+        populate_entries \tbl, \rtbl, \istart, \iend, #PMD_TYPE_TABLE, #PAGE_SIZE, \tmp
+        mov \tbl, \sv
+        mov \sv, \rtbl
+#endif
+
+#if SWAPPER_PGTABLE_LEVELS > 2
+        compute_indices \vstart, \vend, #SWAPPER_TABLE_SHIFT, #PTRS_PER_PMD, \istart, \iend, \count
+        populate_entries \tbl, \rtbl, \istart, \iend, #PMD_TYPE_TABLE, #PAGE_SIZE, \tmp
+        mov \tbl, \sv
+#endif
+
+        compute_indices \vstart, \vend, #SWAPPER_BLOCK_SHIFT, #PTRS_PER_PTE, \istart, \iend, \count
+        bic \count, \phys, #SWAPPER_BLOCK_SIZE - 1
+        populate_entries \tbl, \count, \istart, \iend, \flags, #SWAPPER_BLOCK_SIZE, \tmp
+```
+
+### __create_page_tables
+
+```
+__create_page_tables:
+```
+
+```
+        mov     x28, lr
+```
+
+```
+        /*
+         * Invalidate the init page tables to avoid potential dirty cache lines
+         * being evicted. Other page tables are allocated in rodata as part of
+         * the kernel image, and thus are clean to the PoC per the boot
+         * protocol.
+         */
+        adrp    x0, init_pg_dir
+        adrp    x1, init_pg_end
+        sub     x1, x1, x0
+        bl      __inval_dcache_area
+```
+
+invalidate dcache from `init_pg_dir` to `init_pg_end`.
+
+```
+        /*
+         * Clear the init page tables.
+         */
+        adrp    x0, init_pg_dir
+        adrp    x1, init_pg_end
+        sub     x1, x1, x0
+1:      stp     xzr, xzr, [x0], #16
+        stp     xzr, xzr, [x0], #16
+        stp     xzr, xzr, [x0], #16
+        stp     xzr, xzr, [x0], #16
+        subs    x1, x1, #64
+        b.ne    1b
+```
+
+zero out from `init_pg_dir` to `init_pg_end`. It's a loop,
+each iteration clear 64bytes.
+
+```
+        mov     x7, SWAPPER_MM_MMUFLAGS
+
+        /*
+         * Create the identity mapping.
+         */
+        adrp    x0, idmap_pg_dir
+        adrp    x3, __idmap_text_start          // __pa(__idmap_text_start)
+```
+
+```
+#ifdef CONFIG_ARM64_VA_BITS_52
+        mrs_s   x6, SYS_ID_AA64MMFR2_EL1
+        and     x6, x6, #(0xf << ID_AA64MMFR2_LVA_SHIFT)
+        mov     x5, #52
+        cbnz    x6, 1f
+#endif
+        mov     x5, #VA_BITS_MIN
+1:
+        adr_l   x6, vabits_actual
+        str     x5, [x6]
+        dmb     sy
+        dc      ivac, x6                // Invalidate potentially stale cache line
+```
+
+compute the VA bits and save in `vabits_actual`.

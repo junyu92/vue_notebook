@@ -8,7 +8,8 @@ module.exports = {
           {
             text: 'boot',
             children: [
-              '/kernel/boot/boot.md'
+              '/kernel/boot/boot.md',
+              '/kernel/boot/kaslr.md',
             ]
           },
           {
@@ -52,17 +53,20 @@ module.exports = {
             text: 'Trace',
             children: [
               '/kernel/trace/lockup.md',
-              '/kernel/trace/kprobes.md',
               '/kernel/trace/walk_stack_on_arm.md',
               '/kernel/trace/aarch64_debug.md',
               '/kernel/trace/pmu.md',
               '/kernel/trace/spe.md',
+              '/kernel/trace/kprobes.md',
+              '/kernel/trace/ftrace.md',
             ]
           },
           {
             text: 'misc',
             children: [
-              '/kernel/misc/export_symbol.md'
+              '/kernel/misc/export_symbol.md',
+              '/kernel/misc/uefi.md',
+              '/kernel/misc/dtb.md',
             ]
           },
           {
