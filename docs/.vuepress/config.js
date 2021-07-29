@@ -9,7 +9,7 @@ module.exports = {
           {
             text: 'Booting and Initialization',
             children: [
-              '/kernel/boot/head.md',
+              '/kernel/boot/entry.md',
               '/kernel/boot/kaslr.md',
             ]
           },
@@ -91,7 +91,8 @@ module.exports = {
           '/qemu/pci.md'
         ]
       },
-    ]
+    ],
+    sidebarDepth: 1,
   },
   plugins: [
     '@vuepress/back-to-top',
