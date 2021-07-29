@@ -1,4 +1,4 @@
-# Boot
+# Kernel entry point
 
 ## stext
 
