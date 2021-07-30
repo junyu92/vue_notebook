@@ -51,10 +51,15 @@ module.exports = {
           {
             text: 'Time Management',
             children: [
+              '/kernel/time/time_in_linux.md',
+              '/kernel/time/clocksource_and_timekeeping.md',
               '/kernel/time/jiffies.md',
-              '/kernel/time/clocksource.md',
-              '/kernel/time/tick_broadcast.md',
+              '/kernel/time/clockevents.md',
               '/kernel/time/timer.md',
+              '/kernel/time/hrtimer.md',
+              '/kernel/time/dynamic_timer.md',
+              '/kernel/time/tick_broadcast.md',
+              '/kernel/time/timer_on_arm.md',
             ]
           },
           {
@@ -99,7 +104,7 @@ module.exports = {
             ]
           },
           {
-            text: 'misc',
+            text: 'Misc',
             children: [
               '/kernel/misc/export_symbol.md',
               '/kernel/misc/uefi.md',
