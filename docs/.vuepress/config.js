@@ -14,7 +14,7 @@ module.exports = {
             ]
           },
           {
-            text: 'Memory',
+            text: 'Memory Management',
             children: [
               '/kernel/memory/memory_order.md',
               '/kernel/memory/cache.md',
@@ -24,13 +24,24 @@ module.exports = {
             ]
           },
           {
-            text: 'Driver',
+            text: 'Task',
             children: [
-              '/kernel/driver/pci.md'
+              '/kernel/task/idle.md',
             ]
           },
           {
-            text: 'Interrupt',
+            text: 'Scheduler',
+            children: [
+            ]
+          },
+          {
+            text: 'Syscall',
+            children: [
+              '/kernel/syscall/vdso.md',
+            ]
+          },
+          {
+            text: 'Interrupt Management',
             children: [
               '/kernel/interrupt/interrupt_in_linux.md',
               '/kernel/interrupt/gic.md',
@@ -38,14 +49,36 @@ module.exports = {
             ]
           },
           {
-            text: 'IPC and Sync',
+            text: 'Time Management',
             children: [
-              '/kernel/ipc_and_sync/wait.md',
-              '/kernel/ipc_and_sync/eventfd.md',
+              '/kernel/time/timer.md',
             ]
           },
           {
-            text: 'Power',
+            text: 'IPC',
+            children: [
+              '/kernel/ipc/signal.md',
+              '/kernel/ipc/wait.md',
+              '/kernel/ipc/eventfd.md',
+            ]
+          },
+          {
+            text: 'Synchronization',
+            children: [
+              '/kernel/sync/spinlock.md',
+              '/kernel/sync/mutex.md',
+              '/kernel/sync/semaphore.md',
+              '/kernel/sync/rcu.md',
+            ]
+          },
+          {
+            text: 'Device Driver',
+            children: [
+              '/kernel/driver/pci.md'
+            ]
+          },
+          {
+            text: 'Power Management',
             children: [
               '/kernel/power/psci.md',
             ]
