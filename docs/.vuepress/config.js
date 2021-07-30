@@ -92,7 +92,8 @@ module.exports = {
         ]
       },
     ],
-    sidebarDepth: 1,
+    sidebarDepth: 0,
+    disableAllHeaders: true,
   },
   plugins: [
     '@vuepress/back-to-top',
