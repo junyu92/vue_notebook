@@ -51,6 +51,9 @@ module.exports = {
           {
             text: 'Time Management',
             children: [
+              '/kernel/time/jiffies.md',
+              '/kernel/time/clocksource.md',
+              '/kernel/time/tick_broadcast.md',
               '/kernel/time/timer.md',
             ]
           },
