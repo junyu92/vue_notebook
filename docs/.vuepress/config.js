@@ -59,7 +59,6 @@ module.exports = {
               '/kernel/time/hrtimer.md',
               '/kernel/time/dynamic_timer.md',
               '/kernel/time/tick_broadcast.md',
-              '/kernel/time/timer_on_arm.md',
             ]
           },
           {
