@@ -607,3 +607,86 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
 ```
 
 ## Virtualization (KVM part)
+
+In this section, we are going to talk about how KVM interact with (v)GIC.
+
+### Forward an interrupt (Direct Injection)
+
+```c
+int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+                               struct kvm_kernel_irq_routing_entry *irq_entry)
+{
+        struct vgic_its *its;
+        struct vgic_irq *irq;
+        struct its_vlpi_map map;
+        unsigned long flags;
+        int ret;
+
+        if (!vgic_supports_direct_msis(kvm))
+                return 0;
+
+        /*
+         * Get the ITS, and escape early on error (not a valid
+         * doorbell for any of our vITSs).
+         */
+        its = vgic_get_its(kvm, irq_entry);
+        if (IS_ERR(its))
+                return 0;
+
+        mutex_lock(&its->its_lock);
+
+        /* Perform the actual DevID/EventID -> LPI translation. */
+        ret = vgic_its_resolve_lpi(kvm, its, irq_entry->msi.devid,
+                                   irq_entry->msi.data, &irq);
+        if (ret)
+                goto out;
+```
+
+```c
+        /*
+         * Emit the mapping request. If it fails, the ITS probably
+         * isn't v4 compatible, so let's silently bail out. Holding
+         * the ITS lock should ensure that nothing can modify the
+         * target vcpu.
+         */
+        map = (struct its_vlpi_map) {
+                .vm             = &kvm->arch.vgic.its_vm,
+                .vpe            = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe,
+                .vintid         = irq->intid,
+                .properties     = ((irq->priority & 0xfc) |
+                                   (irq->enabled ? LPI_PROP_ENABLED : 0) |
+                                   LPI_PROP_GROUP1),
+                .db_enabled     = true,
+        };
+
+        ret = its_map_vlpi(virq, &map);
+        if (ret)
+                goto out;
+
+        irq->hw         = true;
+        irq->host_irq   = virq;
+        atomic_inc(&map.vpe->vlpi_count);
+
+        /* Transfer pending state */
+        raw_spin_lock_irqsave(&irq->irq_lock, flags);
+        if (irq->pending_latch) {
+                ret = irq_set_irqchip_state(irq->host_irq,
+                                            IRQCHIP_STATE_PENDING,
+                                            irq->pending_latch);
+                WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
+
+                /*
+                 * Clear pending_latch and communicate this state
+                 * change via vgic_queue_irq_unlock.
+                 */
+                irq->pending_latch = false;
+                vgic_queue_irq_unlock(kvm, irq, flags);
+        } else {
+                raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+        }
+
+out:
+        mutex_unlock(&its->its_lock);
+        return ret;
+}
+```
