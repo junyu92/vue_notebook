@@ -471,9 +471,8 @@ When a peripheral writes to `GITS_TRANSLATER`
 
 ### Direct injection of virtual Software Generated Interrupts (SGIs)
 
-GICv4.1 supports direct injection of SGIs.
-
-Allows SGIs to be directly injected via the ITS. This mechanism still
+GICv4.1 supports direct injection of SGIs which allows SGIs to be
+directly injected via the ITS. This mechanism still
 requires a trap to the hypervisor on the sending PE but removes the
 need for a trap to the hypervisor on the receiving PE(s).
 
@@ -608,5 +607,3 @@ static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
 ```
 
 ## Virtualization (KVM part)
-
-###
