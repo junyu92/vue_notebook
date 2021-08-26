@@ -187,27 +187,56 @@ for preemption to occur. This is controlled through the Binary
 Point registers: `ICC_BPRn_EL1`.
 
 
-## Virtualization
+## Virtualization (GIC part)
 
-### Direct injection of virtual interrupts (GICv4)
+### GICv4(.1)
 
-GICv4 adds support for the direct injection of virtual LPIs (vLPIs).
-This feature allows software to describe to the ITS how physical
-events (EventID, DeviceID) map to virtual interrupts.
+GICv4 supports direct injection of vLPIs. With this feature, physical events
+`(EventID, DeviceID)` can be mapped to virtual interrupts.
 
-If the vPE targeted by interrupt is running, the virtual interrupt
-can be forwarded without the need to first enter the hypervisor.
-This can reduce the overhead associated with virtualized interrupts.
+**If the vPE targeted by interrupt is running, the virtual interrupt can be**
+**forwarded without the need to first enter the hypervisor.**
 
-#### Configuration
+#### Registers
 
-Registers:
+The redistributors have two extra registers to support direct injection.
 
 * `GICR_VPROPBASER`: the address of the virtual LPI Configuration table.
   The configuration of vLPIs is global to all vPEs in the same VM.
+
 * `GICR_VPENDBASER`: the address of virtual LPI Pending table. As with
   the physical LPI Pending table, the VPT records the pending state of
   the vLPIs. **Each vPE has its own private VPT**.
+
+
+#### vPE and resident a vPE
+
+Multiple vPEs might be hosted by a single physical PE, with the
+hypervisor context switching between them. The currently running
+vPE is referred to to as being scheduled.
+
+Invoke `its_make_vpe_resident` to schedule a vPE. More details are
+provided in the following section.
+
+Virtual interrupts for the scheduled vPE can be directly injected.
+If the target vPE is not scheduled, the virtual interrupt is recorded
+as being pending in the appropriate VPT.
+
+#### virtual LPI Pending table (VPT)
+
+`GICR_VPENDBASER` bits[51:16] contains the physical address of the virtual
+LPI Pending table.
+
+```c
+struct its_vpe {
+        struct page             *vpt_page;
+        // ...
+}
+```
+
+#### ITS commands for direct injetion
+
+1. Mapingp a tuple `(EventID, DeviceID)` to `vINTID` for a specific vPE
 
 Two command can be used to map `(EventID, DeviceID)` to a `vINTID` and `vPE`.
 
@@ -218,11 +247,62 @@ Two command can be used to map `(EventID, DeviceID)` to a `vINTID` and `vPE`.
 
 The ITS must be aware of which physical PE a vPE will be scheduled on
 when it is running.
-The `VMAPP` maps a vPE to a physical Redistributor.
+The `VMAPP` maps a vPE to a physical redistributor.
 
 `VMAPP <vPE ID>, <RDADDR>, <VPT>, <VPT size>`
 
-* `<RDADDR>` is the target Redistributor.
+* `<RDADDR>` is the target redistributor.
+
+2. Mapping a vPE to a physical Redistributor
+
+If a hypervisor maps a vPE to a different physical PE, the ITS mappings
+must be updated so that virtual interrupts are sent to the correct
+physical PE. The ITS mappings are updated using the `VMOVP` command,
+followed by `VSYNC` to synchronize the context.
+
+```c
+static void its_send_vmovp(struct its_vpe *vpe);
+```
+
+### Direct injection of virtual interrupts (GICv4)
+
+GICv4 adds support for the direct injection of virtual LPIs (vLPIs).
+This feature allows software to describe to the ITS how physical
+events `(EventID, DeviceID)` map to `virtual interrupts`.
+
+If the vPE targeted by interrupt is running, the virtual interrupt
+can be forwarded without the need to first enter the hypervisor.
+This can reduce the overhead associated with virtualized interrupts.
+
+#### Mapping EventID and DeviceID to virtual interrupts
+
+To map `(EventID, DeviceID) -> virtual interrupt`, `its_map_vlpi` should
+be invoked.
+
+```c
+int its_map_vlpi(int irq, struct its_vlpi_map *map)
+{
+        struct its_cmd_info info = {
+                .cmd_type = MAP_VLPI,
+                {
+                        .map      = map,
+                },
+        };
+        int ret;
+
+        /*
+         * The host will never see that interrupt firing again, so it
+         * is vital that we don't do any lazy masking.
+         */
+        irq_set_status_flags(irq, IRQ_DISABLE_UNLAZY);
+
+        ret = irq_set_vcpu_affinity(irq, &info);
+        if (ret)
+                irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
+
+        return ret;
+}
+```
 
 ```c
 static int its_vlpi_map(struct irq_data *d, struct its_cmd_info *info)
@@ -319,7 +399,53 @@ the Redistributor registers. This means that the hypervisor must:
 * Update `GICR_VPROPBASER`
 * Update `GICR_VPROPBASER`, setting Valid==1 in the process
 
-#### inject interrupts
+```c
+int its_make_vpe_resident(struct its_vpe *vpe, bool g0en, bool g1en)
+{
+        struct its_cmd_info info = { };
+        int ret;
+
+        WARN_ON(preemptible());
+
+        info.cmd_type = SCHEDULE_VPE;
+        if (has_v4_1()) {
+                info.g0en = g0en;
+                info.g1en = g1en;
+        } else {
+                /* Disabled the doorbell, as we're about to enter the guest */
+                disable_irq_nosync(vpe->irq);
+        }
+
+        ret = its_send_vpe_cmd(vpe, &info);
+        if (!ret)
+                vpe->resident = true;
+
+        return ret;
+}
+```
+
+The core function is `its_send_vpe_cmd` which sends `SCHEDULE_VPE` cmd.
+
+```c
+static void its_vpe_4_1_schedule(struct its_vpe *vpe,
+                                 struct its_cmd_info *info)
+{
+        void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
+        u64 val = 0;
+
+        /* Schedule the VPE */
+        val |= GICR_VPENDBASER_Valid;
+        val |= info->g0en ? GICR_VPENDBASER_4_1_VGRP0EN : 0;
+        val |= info->g1en ? GICR_VPENDBASER_4_1_VGRP1EN : 0;
+        val |= FIELD_PREP(GICR_VPENDBASER_4_1_VPEID, vpe->vpe_id);
+
+        gicr_write_vpendbaser(val, vlpi_base + GICR_VPENDBASER);
+}
+```
+
+It writes `VPENDBASER` as above.
+
+#### Inject interrupts
 
 When a peripheral writes to `GITS_TRANSLATER`
 1. The ITS uses the DeviceID to select the appropriate entry from the
@@ -344,3 +470,143 @@ When a peripheral writes to `GITS_TRANSLATER`
       CPU interface.
 
 ### Direct injection of virtual Software Generated Interrupts (SGIs)
+
+GICv4.1 supports direct injection of SGIs.
+
+Allows SGIs to be directly injected via the ITS. This mechanism still
+requires a trap to the hypervisor on the sending PE but removes the
+need for a trap to the hypervisor on the receiving PE(s).
+
+```c
+struct its_vpe {
+        union {
+                /* GICv4.0 implementations */
+                //
+
+                /* GICv4.1 implementations */
+                struct {
+                        //
+                        struct irq_domain       *sgi_domain;
+                        struct {
+                                u8              priority;
+                                bool            enabled;
+                                bool            group;
+                        }                       sgi_config[16];
+                        //
+                }
+        }
+}
+```
+
+```c
+static int its_alloc_vcpu_sgis(struct its_vpe *vpe, int idx)
+{
+        char *name;
+        int sgi_base;
+
+        if (!has_v4_1_sgi())
+                return 0;
+
+        name = kasprintf(GFP_KERNEL, "GICv4-sgi-%d", task_pid_nr(current));
+        if (!name)
+                goto err;
+
+        vpe->fwnode = irq_domain_alloc_named_id_fwnode(name, idx);
+        if (!vpe->fwnode)
+                goto err;
+
+        kfree(name);
+        name = NULL;
+
+        vpe->sgi_domain = irq_domain_create_linear(vpe->fwnode, 16,
+                                                   sgi_domain_ops, vpe);
+        if (!vpe->sgi_domain)
+                goto err;
+
+        sgi_base = __irq_domain_alloc_irqs(vpe->sgi_domain, -1, 16,
+                                               NUMA_NO_NODE, vpe,
+                                               false, NULL);
+        if (sgi_base <= 0)
+                goto err;
+
+        return 0;
+
+err:
+        if (vpe->sgi_domain)
+                irq_domain_remove(vpe->sgi_domain);
+        if (vpe->fwnode)
+                irq_domain_free_fwnode(vpe->fwnode);
+        kfree(name);
+        return -ENOMEM;
+}
+```
+
+kvm enables vsgis via `vgic_v4_configure_vsgis`.
+
+```c
+/* Must be called with the kvm lock held */
+void vgic_v4_configure_vsgis(struct kvm *kvm)
+{
+        struct vgic_dist *dist = &kvm->arch.vgic;
+        struct kvm_vcpu *vcpu;
+        int i;
+
+        kvm_arm_halt_guest(kvm);
+
+        kvm_for_each_vcpu(i, vcpu, kvm) {
+                if (dist->nassgireq)
+                        vgic_v4_enable_vsgis(vcpu);
+                else
+                        vgic_v4_disable_vsgis(vcpu);
+        }
+
+        kvm_arm_resume_guest(kvm);
+}
+
+static void vgic_v4_enable_vsgis(struct kvm_vcpu *vcpu)
+{
+        struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+        int i;
+
+        /*
+         * With GICv4.1, every virtual SGI can be directly injected. So
+         * let's pretend that they are HW interrupts, tied to a host
+         * IRQ. The SGI code will do its magic.
+         */
+        for (i = 0; i < VGIC_NR_SGIS; i++) {
+                struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, i);
+                struct irq_desc *desc;
+                unsigned long flags;
+                int ret;
+
+                raw_spin_lock_irqsave(&irq->irq_lock, flags);
+
+                if (irq->hw)
+                        goto unlock;
+
+                irq->hw = true;
+                irq->host_irq = irq_find_mapping(vpe->sgi_domain, i);
+
+                /* Transfer the full irq state to the vPE */
+                vgic_v4_sync_sgi_config(vpe, irq);
+                desc = irq_to_desc(irq->host_irq);
+                ret = irq_domain_activate_irq(irq_desc_get_irq_data(desc),
+                                              false);
+                if (!WARN_ON(ret)) {
+                        /* Transfer pending state */
+                        ret = irq_set_irqchip_state(irq->host_irq,
+                                                    IRQCHIP_STATE_PENDING,
+                                                    irq->pending_latch);
+                        WARN_ON(ret);
+                        irq->pending_latch = false;
+                }
+        unlock:
+                raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+                vgic_put_irq(vcpu->kvm, irq);
+        }
+}
+```
+
+## Virtualization (KVM part)
+
+###

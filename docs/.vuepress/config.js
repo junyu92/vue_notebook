@@ -120,6 +120,15 @@ module.exports = {
         ]
       },
       {
+        text: 'Rust',
+        children: [
+          '/rust/index.md',
+          '/rust/trait.md',
+          '/rust/pin.md',
+          '/rust/kernel_module_in_rust.md',
+        ]
+      },
+      {
         text: 'Debug',
         children: [
           '/debug/gdb_python.md',
