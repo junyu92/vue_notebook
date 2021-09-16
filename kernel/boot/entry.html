@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="generator" content="VuePress 2.0.0-beta.26">
+    <title>Kernel entry point | Notebook</title><meta name="description" content="">
+    <link rel="preload" href="/vue_notebook/assets/js/runtime~app.47f1fcf0.js" as="script"><link rel="preload" href="/vue_notebook/assets/css/styles.799329ce.css" as="style"><link rel="preload" href="/vue_notebook/assets/js/1812.154fe714.js" as="script"><link rel="preload" href="/vue_notebook/assets/js/app.1f287e75.js" as="script">
+    <link rel="stylesheet" href="/vue_notebook/assets/css/styles.799329ce.css">
+  </head>
+  <body>
+    <div id="app"><!--[--><div class="theme-container"><!--[--><header class="navbar"><div class="toggle-sidebar-button" title="toggle sidebar" aria-expanded="false" role="button" tabindex="0"><div class="icon" aria-hidden="true"><span></span><span></span><span></span></div></div><span><a href="/vue_notebook/" class=""><!----><span class="site-name">Notebook</span></a></span><div class="navbar-links-wrapper" style=""><!--[--><!--]--><!----><!--[--><!--]--><button class="toggle-dark-button" title="toggle dark mode"><svg style="" class="icon" focusable="false" viewBox="0 0 32 32"><path d="M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6z" fill="currentColor"></path><path d="M5.394 6.813l1.414-1.415l3.506 3.506L8.9 10.318z" fill="currentColor"></path><path d="M2 15.005h5v2H2z" fill="currentColor"></path><path d="M5.394 25.197L8.9 21.691l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 25.005h2v5h-2z" fill="currentColor"></path><path d="M21.687 23.106l1.414-1.415l3.506 3.506l-1.414 1.414z" fill="currentColor"></path><path d="M25 15.005h5v2h-5z" fill="currentColor"></path><path d="M21.687 8.904l3.506-3.506l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 2.005h2v5h-2z" fill="currentColor"></path></svg><svg style="display:none;" class="icon" focusable="false" viewBox="0 0 32 32"><path d="M13.502 5.414a15.075 15.075 0 0 0 11.594 18.194a11.113 11.113 0 0 1-7.975 3.39c-.138 0-.278.005-.418 0a11.094 11.094 0 0 1-3.2-21.584M14.98 3a1.002 1.002 0 0 0-.175.016a13.096 13.096 0 0 0 1.825 25.981c.164.006.328 0 .49 0a13.072 13.072 0 0 0 10.703-5.555a1.01 1.01 0 0 0-.783-1.565A13.08 13.08 0 0 1 15.89 4.38A1.015 1.015 0 0 0 14.98 3z" fill="currentColor"></path></svg></button><!----></div></header><!--]--><div class="sidebar-mask"></div><!--[--><aside class="sidebar"><!----><!--[--><!--]--><ul class="sidebar-links"><!--[--><!--[--><p class="sidebar-heading sidebar-item active">Kernel</p><ul class=""><li><!--[--><p class="sidebar-item active">Booting and Initialization</p><ul class="sidebar-sub-items"><li><!--[--><a aria-current="page" href="/vue_notebook/kernel/boot/entry.html" class="router-link-active router-link-exact-active nav-link router-link-active sidebar-item active" aria-label="Kernel entry point"><!--[--><!--]--> Kernel entry point <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/boot/kaslr.html" class="nav-link sidebar-item" aria-label="Kernel Address Space Layout Randomization"><!--[--><!--]--> Kernel Address Space Layout Randomization <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Memory Management</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/memory/memory_order.html" class="nav-link sidebar-item" aria-label="Memory Ordering"><!--[--><!--]--> Memory Ordering <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/memory/cache.html" class="nav-link sidebar-item" aria-label="Cache"><!--[--><!--]--> Cache <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/memory/memory_tagging_extension.html" class="nav-link sidebar-item" aria-label="Memory Tagging Extension"><!--[--><!--]--> Memory Tagging Extension <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/memory/arm64_fault.html" class="nav-link sidebar-item" aria-label="ARM64 Fault"><!--[--><!--]--> ARM64 Fault <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/memory/virtualization.html" class="nav-link sidebar-item" aria-label="Memory Virtualization"><!--[--><!--]--> Memory Virtualization <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Task</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/task/idle.md" class="nav-link sidebar-item" aria-label="/kernel/task/idle.md"><!--[--><!--]--> /kernel/task/idle.md <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/task/thread_info.html" class="nav-link sidebar-item" aria-label="Thread Info"><!--[--><!--]--> Thread Info <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Scheduler</p><!----><!--]--></li><li><!--[--><p class="sidebar-item">Syscall</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/syscall/vdso.md" class="nav-link sidebar-item" aria-label="/kernel/syscall/vdso.md"><!--[--><!--]--> /kernel/syscall/vdso.md <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Interrupt Management</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/interrupt/interrupt_in_linux.html" class="nav-link sidebar-item" aria-label="Interrupt in Linux"><!--[--><!--]--> Interrupt in Linux <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/interrupt/gic.html" class="nav-link sidebar-item" aria-label="GIC"><!--[--><!--]--> GIC <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/interrupt/its.html" class="nav-link sidebar-item" aria-label="Interrupt Translation Service"><!--[--><!--]--> Interrupt Translation Service <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Time Management</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/time/time_in_linux.html" class="nav-link sidebar-item" aria-label="Time Framework in Linux"><!--[--><!--]--> Time Framework in Linux <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/clocksource_and_timekeeping.html" class="nav-link sidebar-item" aria-label="Clocksource and Timerkeeping"><!--[--><!--]--> Clocksource and Timerkeeping <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/jiffies.html" class="nav-link sidebar-item" aria-label="Jiffies"><!--[--><!--]--> Jiffies <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/clockevents.html" class="nav-link sidebar-item" aria-label="Clockevents"><!--[--><!--]--> Clockevents <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/timer.html" class="nav-link sidebar-item" aria-label="(Hardware) Timer"><!--[--><!--]--> (Hardware) Timer <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/hrtimer.html" class="nav-link sidebar-item" aria-label="High resolution timers"><!--[--><!--]--> High resolution timers <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/dynamic_timer.html" class="nav-link sidebar-item" aria-label="Dynamic Timer"><!--[--><!--]--> Dynamic Timer <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/time/tick_broadcast.html" class="nav-link sidebar-item" aria-label="Tick Broadcast"><!--[--><!--]--> Tick Broadcast <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">IPC</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/ipc/signal.md" class="nav-link sidebar-item" aria-label="/kernel/ipc/signal.md"><!--[--><!--]--> /kernel/ipc/signal.md <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/ipc/wait.html" class="nav-link sidebar-item" aria-label="Wait"><!--[--><!--]--> Wait <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/ipc/eventfd.html" class="nav-link sidebar-item" aria-label="eventfd"><!--[--><!--]--> eventfd <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Synchronization</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/sync/spinlock.md" class="nav-link sidebar-item" aria-label="/kernel/sync/spinlock.md"><!--[--><!--]--> /kernel/sync/spinlock.md <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/sync/mutex.md" class="nav-link sidebar-item" aria-label="/kernel/sync/mutex.md"><!--[--><!--]--> /kernel/sync/mutex.md <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/sync/semaphore.md" class="nav-link sidebar-item" aria-label="/kernel/sync/semaphore.md"><!--[--><!--]--> /kernel/sync/semaphore.md <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/sync/rcu.md" class="nav-link sidebar-item" aria-label="/kernel/sync/rcu.md"><!--[--><!--]--> /kernel/sync/rcu.md <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Device Driver</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/driver/pci.html" class="nav-link sidebar-item" aria-label="PCI"><!--[--><!--]--> PCI <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Power Management</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/power/psci.html" class="nav-link sidebar-item" aria-label="PSCI"><!--[--><!--]--> PSCI <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Trace</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/trace/lockup.html" class="nav-link sidebar-item" aria-label="lockup detection"><!--[--><!--]--> lockup detection <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/trace/walk_stack_on_arm.html" class="nav-link sidebar-item" aria-label="Walk stack on ARM"><!--[--><!--]--> Walk stack on ARM <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/trace/aarch64_debug.html" class="nav-link sidebar-item" aria-label="AArch64 Debug"><!--[--><!--]--> AArch64 Debug <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/trace/pmu.html" class="nav-link sidebar-item" aria-label="Performance Monitor Unit"><!--[--><!--]--> Performance Monitor Unit <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/trace/spe.html" class="nav-link sidebar-item" aria-label="Statistical Profiling Extension"><!--[--><!--]--> Statistical Profiling Extension <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/trace/kprobes.html" class="nav-link sidebar-item" aria-label="kprobes"><!--[--><!--]--> kprobes <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/trace/ftrace.html" class="nav-link sidebar-item" aria-label="ftrace"><!--[--><!--]--> ftrace <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Misc</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/misc/rseq.html" class="nav-link sidebar-item" aria-label="Restartable Sequences"><!--[--><!--]--> Restartable Sequences <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/misc/export_symbol.html" class="nav-link sidebar-item" aria-label="Export Kernel Symbol"><!--[--><!--]--> Export Kernel Symbol <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/misc/uefi.html" class="nav-link sidebar-item" aria-label="UEFI"><!--[--><!--]--> UEFI <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/misc/dtb.html" class="nav-link sidebar-item" aria-label="Device Tree"><!--[--><!--]--> Device Tree <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li><li><!--[--><p class="sidebar-item">Virtualization</p><ul class="sidebar-sub-items"><li><!--[--><a href="/vue_notebook/kernel/virtualization/vfio.html" class="nav-link sidebar-item" aria-label="VFIO"><!--[--><!--]--> VFIO <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/kernel/virtualization/secure_virt.html" class="nav-link sidebar-item" aria-label="Secure Virtualization"><!--[--><!--]--> Secure Virtualization <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--></li></ul><!--]--><!--[--><p class="sidebar-heading sidebar-item">Rust</p><ul class=""><li><!--[--><a href="/vue_notebook/rust/" class="nav-link sidebar-item" aria-label="Rust"><!--[--><!--]--> Rust <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/rust/trait.html" class="nav-link sidebar-item" aria-label="Trait"><!--[--><!--]--> Trait <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/rust/pin.html" class="nav-link sidebar-item" aria-label="Pin"><!--[--><!--]--> Pin <!--[--><!--]--></a><!----><!--]--></li><li><!--[--><a href="/vue_notebook/rust/kernel_module_in_rust.html" class="nav-link sidebar-item" aria-label="Kernel Module in Rust"><!--[--><!--]--> Kernel Module in Rust <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--><!--[--><p class="sidebar-heading sidebar-item">Debug</p><ul class=""><li><!--[--><a href="/vue_notebook/debug/gdb_python.html" class="nav-link sidebar-item" aria-label="GDB Python"><!--[--><!--]--> GDB Python <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--><!--[--><p class="sidebar-heading sidebar-item">Qemu</p><ul class=""><li><!--[--><a href="/vue_notebook/qemu/pci.html" class="nav-link sidebar-item" aria-label="PCI"><!--[--><!--]--> PCI <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--><!--[--><p class="sidebar-heading sidebar-item">trusted computing</p><ul class=""><li><!--[--><a href="/vue_notebook/trusted_computing/sgx.html" class="nav-link sidebar-item" aria-label="Intel SGX"><!--[--><!--]--> Intel SGX <!--[--><!--]--></a><!----><!--]--></li></ul><!--]--><!--]--></ul><!--[--><!--]--></aside><!--]--><!--[--><main class="page"><!--[--><!--]--><div class="theme-default-content"><!--[--><h1 id="kernel-entry-point" tabindex="-1"><a class="header-anchor" href="#kernel-entry-point" aria-hidden="true">#</a> Kernel entry point</h1><h2 id="stext" tabindex="-1"><a class="header-anchor" href="#stext" aria-hidden="true">#</a> stext</h2><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token function">ENTRY</span><span class="token punctuation">(</span>stext<span class="token punctuation">)</span>
+        bl      preserve_boot_args
+        bl      el2_setup                       <span class="token comment">// Drop to EL1, w0=cpu_boot_mode</span>
+        adrp    x23<span class="token punctuation">,</span> __PHYS_OFFSET
+        and     x23<span class="token punctuation">,</span> x23<span class="token punctuation">,</span> MIN_KIMG_ALIGN <span class="token operator">-</span> <span class="token number">1</span>    <span class="token comment">// KASLR offset, defaults to 0</span>
+        bl      set_cpu_boot_mode_flag
+        bl      __create_page_tables
+        <span class="token comment">/*
+         * The following calls CPU setup code, see arch/arm64/mm/proc.S for
+         * details.
+         * On return, the CPU will be ready for the MMU to be turned on and
+         * the TCR will have been set.
+         */</span>
+        bl      __cpu_setup                     <span class="token comment">// initialise processor</span>
+        b       __primary_switch
+<span class="token function">ENDPROC</span><span class="token punctuation">(</span>stext<span class="token punctuation">)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br></div></div><h2 id="el2-setup" tabindex="-1"><a class="header-anchor" href="#el2-setup" aria-hidden="true">#</a> el2_setup</h2><p>read <code>CurrentEL</code> register to find out the current exception level.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token function">ENTRY</span><span class="token punctuation">(</span>el2_setup<span class="token punctuation">)</span>
+        msr     SPsel<span class="token punctuation">,</span> #<span class="token number">1</span>                       <span class="token comment">// We want to use SP_EL{1,2}</span>
+        mrs     x0<span class="token punctuation">,</span> CurrentEL
+        cmp     x0<span class="token punctuation">,</span> #CurrentEL_EL2
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>If it is booting in EL1, setup <code>sctlr_el1</code> register and return.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCTLR_EL1_RES1</span>  <span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">_BITUL</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token function">_BITUL</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token function">_BITUL</span><span class="token punctuation">(</span><span class="token number">22</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token function">_BITUL</span><span class="token punctuation">(</span><span class="token number">28</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">|</span> </span><span class="token punctuation">\</span>
+                         <span class="token expression"><span class="token punctuation">(</span><span class="token function">_BITUL</span><span class="token punctuation">(</span><span class="token number">29</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></span></span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        b<span class="token punctuation">.</span>eq    <span class="token number">1f</span>
+        mov_q   x0<span class="token punctuation">,</span> <span class="token punctuation">(</span>SCTLR_EL1_RES1 <span class="token operator">|</span> ENDIAN_SET_EL1<span class="token punctuation">)</span>
+        msr     sctlr_el1<span class="token punctuation">,</span> x0
+        mov     w0<span class="token punctuation">,</span> #BOOT_CPU_MODE_EL1          <span class="token comment">// This cpu booted in EL1</span>
+        isb
+        ret
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>If it is booting in EL2. setup <code>sctlr_el2</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token number">1</span><span class="token operator">:</span>      mov_q   x0<span class="token punctuation">,</span> <span class="token punctuation">(</span>SCTLR_EL2_RES1 <span class="token operator">|</span> ENDIAN_SET_EL2<span class="token punctuation">)</span>
+        msr     sctlr_el2<span class="token punctuation">,</span> x0
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>Read bits[11:8] of <code>id_aa64mmfr1_el1</code> register to find out whether the processor supports VHE.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">CONFIG_ARM64_VHE</span></span>
+        <span class="token comment">/*
+         * Check for VHE being present. For the rest of the EL2 setup,
+         * x2 being non-zero indicates that we do have VHE, and that the
+         * kernel is intended to run at EL2.
+         */</span>
+        mrs     x2<span class="token punctuation">,</span> id_aa64mmfr1_el1
+        ubfx    x2<span class="token punctuation">,</span> x2<span class="token punctuation">,</span> #ID_AA64MMFR1_VHE_SHIFT<span class="token punctuation">,</span> #<span class="token number">4</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+        mov     x2<span class="token punctuation">,</span> xzr
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br></div></div><p>If the processor supports VHE, write <code>hcr_el2</code> to <code>HCR_HOST_VHE_FLAGS</code>, otherwise <code>HCR_HOST_NVHE_FLAGS</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token comment">// Trap General Exceptions</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HCR_TGE</span>         <span class="token expression"><span class="token punctuation">(</span><span class="token function">UL</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">27</span><span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// The Execution state for EL1 is AArch64</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HCR_RW_SHIFT</span>    <span class="token expression"><span class="token number">31</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HCR_RW</span>          <span class="token expression"><span class="token punctuation">(</span><span class="token function">UL</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> HCR_RW_SHIFT<span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// EL2 Host. Enables a configuration where a Host Operating</span>
+<span class="token comment">// System is running in EL2, and the Host Operating System&#39;s</span>
+<span class="token comment">// applications are running in EL0.</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HCR_E2H</span>         <span class="token expression"><span class="token punctuation">(</span><span class="token function">UL</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">34</span><span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HCR_HOST_VHE_FLAGS</span> <span class="token expression"><span class="token punctuation">(</span>HCR_RW <span class="token operator">|</span> HCR_TGE <span class="token operator">|</span> HCR_E2H<span class="token punctuation">)</span></span></span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/* Hyp configuration. */</span>
+        mov_q   x0<span class="token punctuation">,</span> HCR_HOST_NVHE_FLAGS
+        cbz     x2<span class="token punctuation">,</span> set_hcr
+        mov_q   x0<span class="token punctuation">,</span> HCR_HOST_VHE_FLAGS
+set_hcr<span class="token operator">:</span>
+        msr     hcr_el2<span class="token punctuation">,</span> x0
+        isb
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>If NVHE is enabled, setup <code>cnthctl_el2</code> register so that accessing physical timer and counter is allowed.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/*
+         * Allow Non-secure EL1 and EL0 to access physical timer and counter.
+         * This is not necessary for VHE, since the host kernel runs in EL2,
+         * and EL0 accesses are configured in the later stage of boot process.
+         * Note that when HCR_EL2.E2H == 1, CNTHCTL_EL2 has the same bit layout
+         * as CNTKCTL_EL1, and CNTKCTL_EL1 accessing instructions are redefined
+         * to access CNTHCTL_EL2. This allows the kernel designed to run at EL1
+         * to transparently mess with the EL0 bits via CNTKCTL_EL1 access in
+         * EL2.
+         */</span>
+        cbnz    x2<span class="token punctuation">,</span> <span class="token number">1f</span>
+        mrs     x0<span class="token punctuation">,</span> cnthctl_el2
+        orr     x0<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> #<span class="token number">3</span>                      <span class="token comment">// Enable EL1 physical timers</span>
+        msr     cnthctl_el2<span class="token punctuation">,</span> x0
+<span class="token number">1</span><span class="token operator">:</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        msr     cntvoff_el2<span class="token punctuation">,</span> xzr                <span class="token comment">// Clear virtual offset</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br></div></div><p>Read bits[24:4] of <code>id_aa64pfr0_el1</code> register.</p><p>Value 0 means <em>GIC CPU interface system registers not implemented</em>, jump to <code>3f</code>.</p><p>Value not 0 means <em>System register interface to versions 3.0, 4.0 or 4.1 of the GIC CPU interface is supported</em>. In this case, setup <code>SYS_ICC_SRE_EL2</code>.</p><ul><li><code>ICC_SRE_EL2_ENABLE</code>: EL1 accesses to <code>ICC_SRE_EL1</code> do not trap to EL2.</li><li><code>ICC_SRE_EL2_SRE</code>: The System register interface to the ICH_* registers and the EL1 and EL2 ICC_* registers is enabled for EL2.</li></ul><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">CONFIG_ARM_GIC_V3</span></span>
+        <span class="token comment">/* GICv3 system register access */</span>
+        mrs     x0<span class="token punctuation">,</span> id_aa64pfr0_el1
+        ubfx    x0<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> #ID_AA64PFR0_GIC_SHIFT<span class="token punctuation">,</span> #<span class="token number">4</span>
+        cbz     x0<span class="token punctuation">,</span> <span class="token number">3f</span>
+
+        mrs_s   x0<span class="token punctuation">,</span> SYS_ICC_SRE_EL2
+        orr     x0<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> #ICC_SRE_EL2_SRE        <span class="token comment">// Set ICC_SRE_EL2.SRE==1</span>
+        orr     x0<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> #ICC_SRE_EL2_ENABLE     <span class="token comment">// Set ICC_SRE_EL2.Enable==1</span>
+        msr_s   SYS_ICC_SRE_EL2<span class="token punctuation">,</span> x0
+        isb                                     <span class="token comment">// Make sure SRE is now set</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br></div></div><p>Double check, if failed to set <code>SYS_ICC_SRE_EL2</code>, reset <code>SYS_ICH_HCR_EL2</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        mrs_s   x0<span class="token punctuation">,</span> SYS_ICC_SRE_EL2             <span class="token comment">// Read SRE back,</span>
+        tbz     x0<span class="token punctuation">,</span> #<span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">3f</span>                      <span class="token comment">// and check that it sticks</span>
+        msr_s   SYS_ICH_HCR_EL2<span class="token punctuation">,</span> xzr            <span class="token comment">// Reset ICC_HCR_EL2 to defaults</span>
+
+<span class="token number">3</span><span class="token operator">:</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>Read <code>midr_el1</code> register which provides identification information for the PE, including an implementer code for the device and a device ID number.</p><p>Read <code>mpidr_el1</code> which provides an additional PE identification mechanism for scheduling purposes.</p><p>These are useful, see <code>__sysreg_save_el1_state</code> for more details.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/* Populate ID registers. */</span>
+        mrs     x0<span class="token punctuation">,</span> midr_el1
+        mrs     x1<span class="token punctuation">,</span> mpidr_el1
+        msr     vpidr_el2<span class="token punctuation">,</span> x0
+        msr     vmpidr_el2<span class="token punctuation">,</span> x1
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">CONFIG_COMPAT</span></span>
+        msr     hstr_el2<span class="token punctuation">,</span> xzr                   <span class="token comment">// Disable CP15 traps to EL2</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>Read bits[11:8] of <code>id_aa64dfr0_el1</code> register to get the version of pmu. Read bits[35:32] of <code>id_aa64dfr0_el1</code> register to get the version of Statistical Profiling Extension.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/* EL2 debug */</span>
+        mrs     x1<span class="token punctuation">,</span> id_aa64dfr0_el1
+        sbfx    x0<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> #ID_AA64DFR0_PMUVER_SHIFT<span class="token punctuation">,</span> #<span class="token number">4</span>
+        cmp     x0<span class="token punctuation">,</span> #<span class="token number">1</span>
+        b<span class="token punctuation">.</span>lt    <span class="token number">4f</span>                              <span class="token comment">// Skip if no PMU present</span>
+        mrs     x0<span class="token punctuation">,</span> pmcr_el0                    <span class="token comment">// Disable debug access traps</span>
+        ubfx    x0<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> #<span class="token number">11</span><span class="token punctuation">,</span> #<span class="token number">5</span>                 <span class="token comment">// to EL2 and allow access to</span>
+<span class="token number">4</span><span class="token operator">:</span>
+        csel    x3<span class="token punctuation">,</span> xzr<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> lt                 <span class="token comment">// all PMU counters from EL1</span>
+
+        <span class="token comment">/* Statistical profiling */</span>
+        ubfx    x0<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> #ID_AA64DFR0_PMSVER_SHIFT<span class="token punctuation">,</span> #<span class="token number">4</span>
+        cbz     x0<span class="token punctuation">,</span> <span class="token number">7f</span>                          <span class="token comment">// Skip if SPE not present</span>
+        cbnz    x2<span class="token punctuation">,</span> <span class="token number">6f</span>                          <span class="token comment">// VHE?</span>
+        mrs_s   x4<span class="token punctuation">,</span> SYS_PMBIDR_EL1              <span class="token comment">// If SPE available at EL2,</span>
+        and     x4<span class="token punctuation">,</span> x4<span class="token punctuation">,</span> #<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> SYS_PMBIDR_EL1_P_SHIFT<span class="token punctuation">)</span>
+        cbnz    x4<span class="token punctuation">,</span> <span class="token number">5f</span>                          <span class="token comment">// then permit sampling of physical</span>
+        mov     x4<span class="token punctuation">,</span> #<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> SYS_PMSCR_EL2_PCT_SHIFT <span class="token operator">|</span> \
+                      <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> SYS_PMSCR_EL2_PA_SHIFT<span class="token punctuation">)</span>
+        msr_s   SYS_PMSCR_EL2<span class="token punctuation">,</span> x4               <span class="token comment">// addresses and physical counter</span>
+<span class="token number">5</span><span class="token operator">:</span>
+        mov     x1<span class="token punctuation">,</span> #<span class="token punctuation">(</span>MDCR_EL2_E2PB_MASK <span class="token operator">&lt;&lt;</span> MDCR_EL2_E2PB_SHIFT<span class="token punctuation">)</span>
+        orr     x3<span class="token punctuation">,</span> x3<span class="token punctuation">,</span> x1                      <span class="token comment">// If we don&#39;t have VHE, then</span>
+        b       <span class="token number">7f</span>                              <span class="token comment">// use EL1&amp;0 translation.</span>
+<span class="token number">6</span><span class="token operator">:</span>                                              <span class="token comment">// For VHE, use EL2 translation</span>
+        orr     x3<span class="token punctuation">,</span> x3<span class="token punctuation">,</span> #MDCR_EL2_TPMS          <span class="token comment">// and disable access from EL1</span>
+<span class="token number">7</span><span class="token operator">:</span>
+        msr     mdcr_el2<span class="token punctuation">,</span> x3                    <span class="token comment">// Configure debug traps</span>
+```c
+
+Read bits<span class="token punctuation">[</span><span class="token number">19</span><span class="token operator">:</span><span class="token number">16</span><span class="token punctuation">]</span> of `id_aa64mmfr1_el1` <span class="token keyword">register</span> which indicates support
+<span class="token keyword">for</span> LORegions<span class="token punctuation">.</span>
+
+```c
+        <span class="token comment">/* LORegions */</span>
+        mrs     x1<span class="token punctuation">,</span> id_aa64mmfr1_el1
+        ubfx    x0<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> #ID_AA64MMFR1_LOR_SHIFT<span class="token punctuation">,</span> <span class="token number">4</span>
+        cbz     x0<span class="token punctuation">,</span> <span class="token number">1f</span>
+        msr_s   SYS_LORC_EL1<span class="token punctuation">,</span> xzr
+<span class="token number">1</span><span class="token operator">:</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br></div></div><p>Clear <code>vttbr_el2</code> register.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/* Stage-2 translation */</span>
+        msr     vttbr_el2<span class="token punctuation">,</span> xzr
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>If NVHE is enabled, early init EL2. otherwise we directly return. See the following comment for more details.</p><div class="custom-container danger"><p class="custom-container-title">DANGER</p><p>If VHE is enabled, the last instruction is <code>ret</code>; otherwise <code>eret</code>.</p></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        cbz     x2<span class="token punctuation">,</span> install_el2_stub
+
+        mov     w0<span class="token punctuation">,</span> #BOOT_CPU_MODE_EL2          <span class="token comment">// This CPU booted in EL2</span>
+        isb
+        ret
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>install_el2_stub<span class="token operator">:</span>
+        <span class="token comment">/*
+         * When VHE is not in use, early init of EL2 and EL1 needs to be
+         * done here.
+         * When VHE _is_ in use, EL1 will not be used in the host and
+         * requires no configuration, and all non-hyp-specific EL2 setup
+         * will be done via the _EL1 system register aliases in __cpu_setup.
+         */</span>
+        mov_q   x0<span class="token punctuation">,</span> <span class="token punctuation">(</span>SCTLR_EL1_RES1 <span class="token operator">|</span> ENDIAN_SET_EL1<span class="token punctuation">)</span>
+        msr     sctlr_el1<span class="token punctuation">,</span> x0
+
+        <span class="token comment">/* Coprocessor traps. */</span>
+        mov     x0<span class="token punctuation">,</span> #<span class="token number">0x33ff</span>
+        msr     cptr_el2<span class="token punctuation">,</span> x0                    <span class="token comment">// Disable copro. traps to EL2</span>
+
+        <span class="token comment">/* SVE register access */</span>
+        mrs     x1<span class="token punctuation">,</span> id_aa64pfr0_el1
+        ubfx    x1<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> #ID_AA64PFR0_SVE_SHIFT<span class="token punctuation">,</span> #<span class="token number">4</span>
+        cbz     x1<span class="token punctuation">,</span> <span class="token number">7f</span>
+
+        bic     x0<span class="token punctuation">,</span> x0<span class="token punctuation">,</span> #CPTR_EL2_TZ            <span class="token comment">// Also disable SVE traps</span>
+        msr     cptr_el2<span class="token punctuation">,</span> x0                    <span class="token comment">// Disable copro. traps to EL2</span>
+        isb
+        mov     x1<span class="token punctuation">,</span> #ZCR_ELx_LEN_MASK           <span class="token comment">// SVE: Enable full vector</span>
+        msr_s   SYS_ZCR_EL2<span class="token punctuation">,</span> x1                 <span class="token comment">// length for EL1.</span>
+
+        <span class="token comment">/* Hypervisor stub */</span>
+<span class="token number">7</span><span class="token operator">:</span>      adr_l   x0<span class="token punctuation">,</span> __hyp_stub_vectors
+        msr     vbar_el2<span class="token punctuation">,</span> x0
+
+        <span class="token comment">/* spsr */</span>
+        mov     x0<span class="token punctuation">,</span> #<span class="token punctuation">(</span>PSR_F_BIT <span class="token operator">|</span> PSR_I_BIT <span class="token operator">|</span> PSR_A_BIT <span class="token operator">|</span> PSR_D_BIT <span class="token operator">|</span>\
+                      PSR_MODE_EL1h<span class="token punctuation">)</span>
+        msr     spsr_el2<span class="token punctuation">,</span> x0
+        msr     elr_el2<span class="token punctuation">,</span> lr
+        mov     w0<span class="token punctuation">,</span> #BOOT_CPU_MODE_EL2          <span class="token comment">// This CPU booted in EL2</span>
+        eret
+<span class="token function">ENDPROC</span><span class="token punctuation">(</span>el2_setup<span class="token punctuation">)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br></div></div><h2 id="cpu-setup" tabindex="-1"><a class="header-anchor" href="#cpu-setup" aria-hidden="true">#</a> __cpu_setup</h2><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token function">ENTRY</span><span class="token punctuation">(</span>__cpu_setup<span class="token punctuation">)</span>
+        tlbi    vmalle1                         <span class="token comment">// Invalidate local TLB</span>
+        dsb     nsh
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>Dont trap accessing the Advanced SIMD and floating-point registers.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        mov     x0<span class="token punctuation">,</span> #<span class="token number">3</span> <span class="token operator">&lt;&lt;</span> <span class="token number">20</span>
+        msr     cpacr_el1<span class="token punctuation">,</span> x0                   <span class="token comment">// Enable FP/ASIMD</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>EL0 accesses to the AArch64 DCC registers are trapped.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        mov     x0<span class="token punctuation">,</span> #<span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span>                    <span class="token comment">// Reset mdscr_el1 and disable</span>
+        msr     mdscr_el1<span class="token punctuation">,</span> x0                   <span class="token comment">// access to the DCC from EL0</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        isb                                     <span class="token comment">// Unmask debug exceptions now,</span>
+        enable_dbg                              <span class="token comment">// since this is per-cpu</span>
+        reset_pmuserenr_el0 x0                  <span class="token comment">// Disable PMU access from EL0</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p><code>mair_el1</code> provides the memory attribute encodings corresponding to the possible AttrIndx values in a Long-descriptor format translation table entry for stage 1 translations at EL1.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/*
+         * Memory region attributes for LPAE:
+         *
+         *   n = AttrIndx[2:0]
+         *                      n       MAIR
+         *   DEVICE_nGnRnE      000     00000000
+         *   DEVICE_nGnRE       001     00000100
+         *   DEVICE_GRE         010     00001100
+         *   NORMAL_NC          011     01000100
+         *   NORMAL             100     11111111
+         *   NORMAL_WT          101     10111011
+         */</span>
+        ldr     x5<span class="token punctuation">,</span> <span class="token operator">=</span><span class="token function">MAIR</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> MT_DEVICE_nGnRnE<span class="token punctuation">)</span> <span class="token operator">|</span> \
+                     <span class="token function">MAIR</span><span class="token punctuation">(</span><span class="token number">0x04</span><span class="token punctuation">,</span> MT_DEVICE_nGnRE<span class="token punctuation">)</span> <span class="token operator">|</span> \
+                     <span class="token function">MAIR</span><span class="token punctuation">(</span><span class="token number">0x0c</span><span class="token punctuation">,</span> MT_DEVICE_GRE<span class="token punctuation">)</span> <span class="token operator">|</span> \
+                     <span class="token function">MAIR</span><span class="token punctuation">(</span><span class="token number">0x44</span><span class="token punctuation">,</span> MT_NORMAL_NC<span class="token punctuation">)</span> <span class="token operator">|</span> \
+                     <span class="token function">MAIR</span><span class="token punctuation">(</span><span class="token number">0xff</span><span class="token punctuation">,</span> MT_NORMAL<span class="token punctuation">)</span> <span class="token operator">|</span> \
+                     <span class="token function">MAIR</span><span class="token punctuation">(</span><span class="token number">0xbb</span><span class="token punctuation">,</span> MT_NORMAL_WT<span class="token punctuation">)</span>
+        msr     mair_el1<span class="token punctuation">,</span> x5
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/*
+         * Prepare SCTLR
+         */</span>
+        mov_q   x0<span class="token punctuation">,</span> SCTLR_EL1_SET
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>setup <code>tcr_el1</code> which is the control register for stage 1 of the EL1&amp;0 translation regime.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/*
+         * Set/prepare TCR and TTBR. We use 512GB (39-bit) address range for
+         * both user and kernel.
+         */</span>
+        ldr     x10<span class="token punctuation">,</span> <span class="token operator">=</span><span class="token function">TCR_TxSZ</span><span class="token punctuation">(</span>VA_BITS<span class="token punctuation">)</span> <span class="token operator">|</span> TCR_CACHE_FLAGS <span class="token operator">|</span> TCR_SMP_FLAGS <span class="token operator">|</span> \
+                        TCR_TG_FLAGS <span class="token operator">|</span> TCR_KASLR_FLAGS <span class="token operator">|</span> TCR_ASID16 <span class="token operator">|</span> \
+                        TCR_TBI0 <span class="token operator">|</span> TCR_A1 <span class="token operator">|</span> TCR_KASAN_FLAGS
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">CONFIG_ARM64_USER_VA_BITS_52</span></span>
+        ldr_l           x9<span class="token punctuation">,</span> vabits_user
+        sub             x9<span class="token punctuation">,</span> xzr<span class="token punctuation">,</span> x9
+        add             x9<span class="token punctuation">,</span> x9<span class="token punctuation">,</span> #<span class="token number">64</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+        ldr_l           x9<span class="token punctuation">,</span> idmap_t0sz
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+        tcr_set_t0sz    x10<span class="token punctuation">,</span> x9
+
+        <span class="token comment">/*
+         * Set the IPS bits in TCR_EL1.
+         */</span>
+        tcr_compute_pa_size x10<span class="token punctuation">,</span> #TCR_IPS_SHIFT<span class="token punctuation">,</span> x5<span class="token punctuation">,</span> x6
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">CONFIG_ARM64_HW_AFDBM</span></span>
+        <span class="token comment">/*
+         * Enable hardware update of the Access Flags bit.
+         * Hardware dirty bit management is enabled later,
+         * via capabilities.
+         */</span>
+        mrs     x9<span class="token punctuation">,</span> ID_AA64MMFR1_EL1
+        and     x9<span class="token punctuation">,</span> x9<span class="token punctuation">,</span> #<span class="token number">0xf</span>
+        cbz     x9<span class="token punctuation">,</span> <span class="token number">1f</span>
+        orr     x10<span class="token punctuation">,</span> x10<span class="token punctuation">,</span> #TCR_HA               <span class="token comment">// hardware Access flag update</span>
+<span class="token number">1</span><span class="token operator">:</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span>  <span class="token comment">/* CONFIG_ARM64_HW_AFDBM */</span></span>
+        msr     tcr_el1<span class="token punctuation">,</span> x10
+        ret                                     <span class="token comment">// return to head.S</span>
+<span class="token function">ENDPROC</span><span class="token punctuation">(</span>__cpu_setup<span class="token punctuation">)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br></div></div><h2 id="create-page-tables" tabindex="-1"><a class="header-anchor" href="#create-page-tables" aria-hidden="true">#</a> create page tables</h2><p><code>__create_page_tables</code> creates initial page tables.</p><p>There are many kinds of page tables:</p><ul><li><code>idmap_pg_dir</code> identity mapping, va = pa, will be saved in <code>ttbr0_el1</code></li><li><code>init_pg_dir</code>, will be saved in <code>ttbr1_el1</code>. This page table will be freed in <code>paging_init</code> function.</li><li><code>swapper_pg_dir</code></li></ul><p>Why we need idmap:</p><blockquote><p>If the PA of the software that enables or disables a particular stage of address translation differs from its VA, speculative instruction fetching can cause complications. ARM strongly recommends that the PA and VA of any software that enables or disables a stage of address translation are identical if that stage of translation controls translations that apply to the software currently being executed.</p></blockquote><h3 id="compute-indices" tabindex="-1"><a class="header-anchor" href="#compute-indices" aria-hidden="true">#</a> compute_indices</h3><div class="custom-container warning"><p class="custom-container-title">WARNING</p><p>The comment of code is not correct.</p></div><p>return value:</p><p>istart = (vstart&gt;&gt;shift) &amp; (ptrs-1), the index of page table to vstart. iend = ((vend&gt;&gt;shift) &amp; (ptrs-1)) + (count * ptrs), the index of page table to vend. count = how many extra entries required for next page table level.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token comment">/*
+ * Compute indices of table entries from virtual address range. If multiple entries
+ * were needed in the previous page table level then the next page table level is assumed
+ * to be composed of multiple pages. (This effectively scales the end index).
+ *
+ *      vstart: virtual address of start of range
+ *      vend:   virtual address of end of range
+ *      shift:  shift used to transform virtual address into index
+ *      ptrs:   number of entries in page table
+ *      istart: index in table corresponding to vstart
+ *      iend:   index in table corresponding to vend
+ *      count:  On entry: how many extra entries were required in previous level, scales
+ *                        our end index.
+ *              On exit: returns how many extra entries required for next page table level
+ *
+ * Preserves:   vstart, vend, shift, ptrs
+ * Returns:     istart, iend, count
+ */</span>
+        <span class="token punctuation">.</span>macro compute_indices<span class="token punctuation">,</span> vstart<span class="token punctuation">,</span> vend<span class="token punctuation">,</span> shift<span class="token punctuation">,</span> ptrs<span class="token punctuation">,</span> istart<span class="token punctuation">,</span> iend<span class="token punctuation">,</span> count
+        lsr     \iend<span class="token punctuation">,</span> \vend<span class="token punctuation">,</span> \shift
+        mov     \istart<span class="token punctuation">,</span> \ptrs
+        sub     \istart<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> #<span class="token number">1</span>
+        and     \iend<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \istart   <span class="token comment">// iend = (vend &gt;&gt; shift) &amp; (ptrs - 1)</span>
+        mov     \istart<span class="token punctuation">,</span> \ptrs
+        mul     \istart<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \count
+        add     \iend<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \istart   <span class="token comment">// iend += (count - 1) * ptrs</span>
+                                        <span class="token comment">// our entries span multiple tables</span>
+
+        lsr     \istart<span class="token punctuation">,</span> \vstart<span class="token punctuation">,</span> \shift
+        mov     \count<span class="token punctuation">,</span> \ptrs
+        sub     \count<span class="token punctuation">,</span> \count<span class="token punctuation">,</span> #<span class="token number">1</span>
+        and     \istart<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \count
+
+        sub     \count<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \istart
+        <span class="token punctuation">.</span>endm
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br></div></div><h3 id="populate-page-table" tabindex="-1"><a class="header-anchor" href="#populate-page-table" aria-hidden="true">#</a> populate page table</h3><p>The function allocates <code>eindex-index</code> the next level page tables (which is a page) and fills page table entries.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token operator">*</span>
+ <span class="token operator">*</span> Macro to populate page table entries<span class="token punctuation">,</span> these entries can be pointers to the next level
+ <span class="token operator">*</span> or last level entries pointing to physical memory<span class="token punctuation">.</span>
+ <span class="token operator">*</span>
+ <span class="token operator">*</span>      tbl<span class="token operator">:</span>    page table address
+ <span class="token operator">*</span>      rtbl<span class="token operator">:</span>   pointer to page table or physical memory
+ <span class="token operator">*</span>      index<span class="token operator">:</span>  start index to write
+ <span class="token operator">*</span>      eindex<span class="token operator">:</span> end index to write <span class="token operator">-</span> <span class="token punctuation">[</span>index<span class="token punctuation">,</span> eindex<span class="token punctuation">]</span> written to
+ <span class="token operator">*</span>      flags<span class="token operator">:</span>  flags <span class="token keyword">for</span> pagetable entry to or in
+ <span class="token operator">*</span>      inc<span class="token operator">:</span>    increment to rtbl between each entry
+ <span class="token operator">*</span>      tmp1<span class="token operator">:</span>   temporary variable
+ <span class="token operator">*</span>
+ <span class="token operator">*</span> Preserves<span class="token operator">:</span>   tbl<span class="token punctuation">,</span> eindex<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> inc
+ <span class="token operator">*</span> Corrupts<span class="token operator">:</span>    index<span class="token punctuation">,</span> tmp1
+ <span class="token operator">*</span> Returns<span class="token operator">:</span>     rtbl
+ <span class="token operator">*</span><span class="token operator">/</span>
+        <span class="token punctuation">.</span>macro populate_entries<span class="token punctuation">,</span> tbl<span class="token punctuation">,</span> rtbl<span class="token punctuation">,</span> index<span class="token punctuation">,</span> eindex<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> inc<span class="token punctuation">,</span> tmp1
+<span class="token punctuation">.</span>Lpe\@<span class="token operator">:</span> phys_to_pte \tmp1<span class="token punctuation">,</span> \rtbl
+        orr     \tmp1<span class="token punctuation">,</span> \tmp1<span class="token punctuation">,</span> \flags    <span class="token comment">// tmp1 = table entry</span>
+        str     \tmp1<span class="token punctuation">,</span> <span class="token punctuation">[</span>\tbl<span class="token punctuation">,</span> \index<span class="token punctuation">,</span> lsl #<span class="token number">3</span><span class="token punctuation">]</span>
+        add     \rtbl<span class="token punctuation">,</span> \rtbl<span class="token punctuation">,</span> \inc      <span class="token comment">// rtbl = pa next level</span>
+        add     \index<span class="token punctuation">,</span> \index<span class="token punctuation">,</span> #<span class="token number">1</span>
+        cmp     \index<span class="token punctuation">,</span> \eindex
+        b<span class="token punctuation">.</span>ls    <span class="token punctuation">.</span>Lpe\@
+        <span class="token punctuation">.</span>endm
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br></div></div><h3 id="map-memory" tabindex="-1"><a class="header-anchor" href="#map-memory" aria-hidden="true">#</a> map_memory</h3><p><code>map_memory</code> maps <code>[vstart, vend]</code> to <code>[phys, vend-vstart+phys]</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token comment">/*
+ * Map memory for specified virtual address range. Each level of page table needed supports
+ * multiple entries. If a level requires n entries the next page table level is assumed to be
+ * formed from n pages.
+ *
+ *      tbl:    location of page table
+ *      rtbl:   address to be used for first level page table entry (typically tbl + PAGE_SIZE)
+ *      vstart: start address to map
+ *      vend:   end address to map - we map [vstart, vend]
+ *      flags:  flags to use to map last level entries
+ *      phys:   physical address corresponding to vstart - physical memory is contiguous
+ *      pgds:   the number of pgd entries
+ *
+ * Temporaries: istart, iend, tmp, count, sv - these need to be different registers
+ * Preserves:   vstart, vend, flags
+ * Corrupts:    tbl, rtbl, istart, iend, tmp, count, sv
+ */</span>
+        <span class="token punctuation">.</span>macro map_memory<span class="token punctuation">,</span> tbl<span class="token punctuation">,</span> rtbl<span class="token punctuation">,</span> vstart<span class="token punctuation">,</span> vend<span class="token punctuation">,</span> flags<span class="token punctuation">,</span> phys<span class="token punctuation">,</span> pgds<span class="token punctuation">,</span> istart<span class="token punctuation">,</span> iend<span class="token punctuation">,</span> tmp<span class="token punctuation">,</span> count<span class="token punctuation">,</span> sv
+        add \rtbl<span class="token punctuation">,</span> \tbl<span class="token punctuation">,</span> #PAGE_SIZE
+        mov \sv<span class="token punctuation">,</span> \rtbl
+        mov \count<span class="token punctuation">,</span> #<span class="token number">0</span>
+        compute_indices \vstart<span class="token punctuation">,</span> \vend<span class="token punctuation">,</span> #PGDIR_SHIFT<span class="token punctuation">,</span> \pgds<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \count
+        populate_entries \tbl<span class="token punctuation">,</span> \rtbl<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> #PMD_TYPE_TABLE<span class="token punctuation">,</span> #PAGE_SIZE<span class="token punctuation">,</span> \tmp
+        mov \tbl<span class="token punctuation">,</span> \sv
+        mov \sv<span class="token punctuation">,</span> \rtbl
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">SWAPPER_PGTABLE_LEVELS <span class="token operator">&gt;</span> <span class="token number">3</span></span></span>
+        compute_indices \vstart<span class="token punctuation">,</span> \vend<span class="token punctuation">,</span> #PUD_SHIFT<span class="token punctuation">,</span> #PTRS_PER_PUD<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \count
+        populate_entries \tbl<span class="token punctuation">,</span> \rtbl<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> #PMD_TYPE_TABLE<span class="token punctuation">,</span> #PAGE_SIZE<span class="token punctuation">,</span> \tmp
+        mov \tbl<span class="token punctuation">,</span> \sv
+        mov \sv<span class="token punctuation">,</span> \rtbl
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">SWAPPER_PGTABLE_LEVELS <span class="token operator">&gt;</span> <span class="token number">2</span></span></span>
+        compute_indices \vstart<span class="token punctuation">,</span> \vend<span class="token punctuation">,</span> #SWAPPER_TABLE_SHIFT<span class="token punctuation">,</span> #PTRS_PER_PMD<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \count
+        populate_entries \tbl<span class="token punctuation">,</span> \rtbl<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> #PMD_TYPE_TABLE<span class="token punctuation">,</span> #PAGE_SIZE<span class="token punctuation">,</span> \tmp
+        mov \tbl<span class="token punctuation">,</span> \sv
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+        compute_indices \vstart<span class="token punctuation">,</span> \vend<span class="token punctuation">,</span> #SWAPPER_BLOCK_SHIFT<span class="token punctuation">,</span> #PTRS_PER_PTE<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \count
+        <span class="token comment">// mask physical address with (#SWAPPER_BLOCK_SIZE - 1) and store in count</span>
+        bic \count<span class="token punctuation">,</span> \phys<span class="token punctuation">,</span> #SWAPPER_BLOCK_SIZE <span class="token operator">-</span> <span class="token number">1</span>
+        populate_entries \tbl<span class="token punctuation">,</span> \count<span class="token punctuation">,</span> \istart<span class="token punctuation">,</span> \iend<span class="token punctuation">,</span> \flags<span class="token punctuation">,</span> #SWAPPER_BLOCK_SIZE<span class="token punctuation">,</span> \tmp
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br></div></div><h3 id="create-page-tables-1" tabindex="-1"><a class="header-anchor" href="#create-page-tables-1" aria-hidden="true">#</a> __create_page_tables</h3><p><code>__create_page_tables</code> creates two mapping:</p><ol><li><code>[__idmap_text_start, __idmap_text_end]</code> to <code>[__idmap_text_start, __idmap_text_end]</code> in page table <code>idmap_pg_dir</code></li><li><code>[KIMAGE_VADDR + TEXT_OFFSET + kaslr, KIMAGE_VADDR + TEXT_OFFSET + kaslr + _end - _text]</code> to <code>[_text, _end]</code> in page table <code>init_pg_dir</code></li></ol><div class="language-text ext-text line-numbers-mode"><pre class="language-text"><code>__create_page_tables:
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br></div></div><div class="language-text ext-text line-numbers-mode"><pre class="language-text"><code>        mov     x28, lr
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br></div></div><div class="language-text ext-text line-numbers-mode"><pre class="language-text"><code>        /*
+         * Invalidate the init page tables to avoid potential dirty cache lines
+         * being evicted. Other page tables are allocated in rodata as part of
+         * the kernel image, and thus are clean to the PoC per the boot
+         * protocol.
+         */
+        adrp    x0, init_pg_dir
+        adrp    x1, init_pg_end
+        sub     x1, x1, x0
+        bl      __inval_dcache_area
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br></div></div><p>invalidate dcache from <code>init_pg_dir</code> to <code>init_pg_end</code>.</p><div class="language-text ext-text line-numbers-mode"><pre class="language-text"><code>        /*
+         * Clear the init page tables.
+         */
+        adrp    x0, init_pg_dir
+        adrp    x1, init_pg_end
+        sub     x1, x1, x0
+1:      stp     xzr, xzr, [x0], #16
+        stp     xzr, xzr, [x0], #16
+        stp     xzr, xzr, [x0], #16
+        stp     xzr, xzr, [x0], #16
+        subs    x1, x1, #64
+        b.ne    1b
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br></div></div><p>zero out from <code>init_pg_dir</code> to <code>init_pg_end</code>. It&#39;s a loop, each iteration clear 64bytes.</p><p>Now we are goint to create page tables.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        mov     x7<span class="token punctuation">,</span> SWAPPER_MM_MMUFLAGS
+
+        <span class="token comment">/*
+         * Create the identity mapping.
+         */</span>
+        adrp    x0<span class="token punctuation">,</span> idmap_pg_dir
+        adrp    x3<span class="token punctuation">,</span> __idmap_text_start          <span class="token comment">// __pa(__idmap_text_start)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>The following code handles va bit extension</p><div class="language-text ext-text line-numbers-mode"><pre class="language-text"><code>#ifdef CONFIG_ARM64_VA_BITS_52
+        mrs_s   x6, SYS_ID_AA64MMFR2_EL1
+        and     x6, x6, #(0xf &lt;&lt; ID_AA64MMFR2_LVA_SHIFT)
+        mov     x5, #52
+        cbnz    x6, 1f
+#endif
+        mov     x5, #VA_BITS_MIN
+1:
+        adr_l   x6, vabits_actual
+        str     x5, [x6]
+        dmb     sy
+        dc      ivac, x6                // Invalidate potentially stale cache line
+
+        /*
+         * VA_BITS may be too small to allow for an ID mapping to be created
+         * that covers system RAM if that is located sufficiently high in the
+         * physical address space. So for the ID map, use an extended virtual
+         * range in that case, and configure an additional translation level
+         * if needed.
+         *
+         * Calculate the maximum allowed value for TCR_EL1.T0SZ so that the
+         * entire ID map region can be mapped. As T0SZ == (64 - #bits used),
+         * this number conveniently equals the number of leading zeroes in
+         * the physical address of __idmap_text_end.
+         */
+        adrp    x5, __idmap_text_end
+        clz     x5, x5
+        cmp     x5, TCR_T0SZ(VA_BITS)   // default T0SZ small enough?
+        b.ge    1f                      // .. then skip VA range extension
+
+        adr_l   x6, idmap_t0sz
+        str     x5, [x6]
+        dmb     sy
+        dc      ivac, x6                // Invalidate potentially stale cache line
+
+#if (VA_BITS &lt; 48)
+#define EXTRA_SHIFT     (PGDIR_SHIFT + PAGE_SHIFT - 3)
+#define EXTRA_PTRS      (1 &lt;&lt; (PHYS_MASK_SHIFT - EXTRA_SHIFT))
+
+        /*
+         * If VA_BITS &lt; 48, we have to configure an additional table level.
+         * First, we have to verify our assumption that the current value of
+         * VA_BITS was chosen such that all translation levels are fully
+         * utilised, and that lowering T0SZ will always result in an additional
+         * translation level to be configured.
+         */
+#if VA_BITS != EXTRA_SHIFT
+#error &quot;Mismatch between VA_BITS and page size/number of translation levels&quot;
+#endif
+
+        mov     x4, EXTRA_PTRS
+        create_table_entry x0, x3, EXTRA_SHIFT, x4, x5, x6
+#else
+        /*
+         * If VA_BITS == 48, we don&#39;t have to configure an additional
+         * translation level, but the top-level table has more entries.
+         */
+        mov     x4, #1 &lt;&lt; (PHYS_MASK_SHIFT - PGDIR_SHIFT)
+        str_l   x4, idmap_ptrs_per_pgd, x5
+#endif
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code><span class="token number">1</span><span class="token operator">:</span>
+        ldr_l   x4<span class="token punctuation">,</span> idmap_ptrs_per_pgd
+        mov     x5<span class="token punctuation">,</span> x3                          <span class="token comment">// __pa(__idmap_text_start)</span>
+        adr_l   x6<span class="token punctuation">,</span> __idmap_text_end            <span class="token comment">// __pa(__idmap_text_end)</span>
+
+        map_memory x0<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> x3<span class="token punctuation">,</span> x6<span class="token punctuation">,</span> x7<span class="token punctuation">,</span> x3<span class="token punctuation">,</span> x4<span class="token punctuation">,</span> x10<span class="token punctuation">,</span> x11<span class="token punctuation">,</span> x12<span class="token punctuation">,</span> x13<span class="token punctuation">,</span> x14
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>Mapping kernel image in <code>init_pg_dir</code> page table.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/*
+         * Map the kernel image (starting with PHYS_OFFSET).
+         */</span>
+        adrp    x0<span class="token punctuation">,</span> init_pg_dir
+        mov_q   x5<span class="token punctuation">,</span> KIMAGE_VADDR <span class="token operator">+</span> TEXT_OFFSET  <span class="token comment">// compile time __va(_text)</span>
+        add     x5<span class="token punctuation">,</span> x5<span class="token punctuation">,</span> x23                     <span class="token comment">// add KASLR displacement</span>
+        mov     x4<span class="token punctuation">,</span> PTRS_PER_PGD
+        adrp    x6<span class="token punctuation">,</span> _end                        <span class="token comment">// runtime __pa(_end)</span>
+        adrp    x3<span class="token punctuation">,</span> _text                       <span class="token comment">// runtime __pa(_text)</span>
+        sub     x6<span class="token punctuation">,</span> x6<span class="token punctuation">,</span> x3                      <span class="token comment">// _end - _text</span>
+        add     x6<span class="token punctuation">,</span> x6<span class="token punctuation">,</span> x5                      <span class="token comment">// runtime __va(_end)</span>
+
+        map_memory x0<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> x5<span class="token punctuation">,</span> x6<span class="token punctuation">,</span> x7<span class="token punctuation">,</span> x3<span class="token punctuation">,</span> x4<span class="token punctuation">,</span> x10<span class="token punctuation">,</span> x11<span class="token punctuation">,</span> x12<span class="token punctuation">,</span> x13<span class="token punctuation">,</span> x14
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>flushing <code>[idmap_pg_dir, init_pg_end]</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">/*
+         * Since the page tables have been populated with non-cacheable
+         * accesses (MMU disabled), invalidate the idmap and swapper page
+         * tables again to remove any speculatively loaded cache lines.
+         */</span>
+        adrp    x0<span class="token punctuation">,</span> idmap_pg_dir
+        adrp    x1<span class="token punctuation">,</span> init_pg_end
+        sub     x1<span class="token punctuation">,</span> x1<span class="token punctuation">,</span> x0
+        dmb     sy
+        bl      __inval_dcache_area
+
+        ret     x28
+<span class="token function">ENDPROC</span><span class="token punctuation">(</span>__create_page_tables<span class="token punctuation">)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><h2 id="primary-switch" tabindex="-1"><a class="header-anchor" href="#primary-switch" aria-hidden="true">#</a> __primary_switch</h2><div class="custom-container warning"><p class="custom-container-title">WARNING</p><p>We removed some code related to kaslr, see KASLR chapter for more details.</p></div><p>This function enables mmu and jump to <code>__primary_switched</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>__primary_switch<span class="token operator">:</span>
+        adrp    x1<span class="token punctuation">,</span> init_pg_dir
+        bl      __enable_mmu
+
+        ldr     x8<span class="token punctuation">,</span> <span class="token operator">=</span>__primary_switched
+        adrp    x0<span class="token punctuation">,</span> __PHYS_OFFSET
+        br      x8
+<span class="token function">ENDPROC</span><span class="token punctuation">(</span>__primary_switch<span class="token punctuation">)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br></div></div><h2 id="primary-switched" tabindex="-1"><a class="header-anchor" href="#primary-switched" aria-hidden="true">#</a> __primary_switched</h2><div class="custom-container warning"><p class="custom-container-title">WARNING</p><p>We removed some code related to kaslr, see KASLR chapter for more details.</p></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>__primary_switched<span class="token operator">:</span>
+        adrp    x4<span class="token punctuation">,</span> init_thread_union
+        add     sp<span class="token punctuation">,</span> x4<span class="token punctuation">,</span> #THREAD_SIZE
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>points current <code>SP</code> to <code>init_thread_union + #THREAD_SIZE</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        adr_l   x5<span class="token punctuation">,</span> init_task
+        msr     sp_el0<span class="token punctuation">,</span> x5                      <span class="token comment">// Save thread_info</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p><code>sp_el0</code> points to <code>init_task</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        adr_l   x8<span class="token punctuation">,</span> vectors                     <span class="token comment">// load VBAR_EL1 with virtual</span>
+        msr     vbar_el1<span class="token punctuation">,</span> x8                    <span class="token comment">// vector table address</span>
+        isb
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>setup exception vectors (see kernel/entry.S).</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        stp     xzr<span class="token punctuation">,</span> x30<span class="token punctuation">,</span> <span class="token punctuation">[</span>sp<span class="token punctuation">,</span> #<span class="token operator">-</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token operator">!</span>
+        mov     x29<span class="token punctuation">,</span> sp
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        str_l   x21<span class="token punctuation">,</span> __fdt_pointer<span class="token punctuation">,</span> x5          <span class="token comment">// Save FDT pointer</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br></div></div><p>Save the addres of dbt into <code>__fdt_pointer</code> for <code>kaslr_early_init</code>, we ignore it here.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        ldr_l   x4<span class="token punctuation">,</span> kimage_vaddr                <span class="token comment">// Save the offset between</span>
+        sub     x4<span class="token punctuation">,</span> x4<span class="token punctuation">,</span> x0                      <span class="token comment">// the kernel virtual and</span>
+        str_l   x4<span class="token punctuation">,</span> kimage_voffset<span class="token punctuation">,</span> x5          <span class="token comment">// physical mappings</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>save <code>kimage_vaddr - __PHYS_OFFSET</code> into <code>kimage_voffset</code>. The offset between the kernel virtual and physical mappings. Used to translate virtual to physical addresses.</p><p>See <code>Documentation/admin-guide/kdump/vmcoreinfo.rst</code>.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        <span class="token comment">// Clear BSS</span>
+        adr_l   x0<span class="token punctuation">,</span> __bss_start
+        mov     x1<span class="token punctuation">,</span> xzr
+        adr_l   x2<span class="token punctuation">,</span> __bss_stop
+        sub     x2<span class="token punctuation">,</span> x2<span class="token punctuation">,</span> x0
+        bl      __pi_memset
+        dsb     ishst                           <span class="token comment">// Make zero page visible to PTW</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>clears bss section.</p><div class="language-c ext-c line-numbers-mode"><pre class="language-c"><code>        add     sp<span class="token punctuation">,</span> sp<span class="token punctuation">,</span> #<span class="token number">16</span>
+        mov     x29<span class="token punctuation">,</span> #<span class="token number">0</span>
+        mov     x30<span class="token punctuation">,</span> #<span class="token number">0</span>
+        b       start_kernel
+<span class="token function">ENDPROC</span><span class="token punctuation">(</span>__primary_switched<span class="token punctuation">)</span>
+</code></pre><div class="line-numbers"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><p>jumps to <code>start_kernel</code>.</p><h2 id="reference" tabindex="-1"><a class="header-anchor" href="#reference" aria-hidden="true">#</a> Reference</h2><blockquote><p>https://evsio0n.com/archives/316/</p></blockquote><blockquote><p>http://gngshn.github.io/2017/11/30/arm64-linux启动流程分析08-正式跳入内核空间虚拟地址段运行/</p></blockquote><blockquote><p>Documentation/admin-guide/kdump/vmcoreinfo.rst</p></blockquote><!--]--></div><footer class="page-meta"><!----><div class="meta-item last-updated"><span class="meta-item-label">Last Updated: </span><span class="meta-item-info">7/29/2021, 10:45:25 AM</span></div><div class="meta-item contributors"><span class="meta-item-label">Contributors: </span><span class="meta-item-info"><!--[--><!--[--><span class="contributor" title="email: zhangjunyu.92@bytedance.com">Zhang Junyu</span><!----><!--]--><!--]--></span></div></footer><nav class="page-nav"><p class="inner"><!----><span class="next"><a href="/vue_notebook/kernel/boot/kaslr.html" class="nav-link" aria-label="Kernel Address Space Layout Randomization"><!--[--><!--]--> Kernel Address Space Layout Randomization <!--[--><!--]--></a> → </span></p></nav><!--[--><!--]--></main><!--]--></div><!----><!--]--></div>
+    <script src="/vue_notebook/assets/js/runtime~app.47f1fcf0.js" defer></script><script src="/vue_notebook/assets/js/1812.154fe714.js" defer></script><script src="/vue_notebook/assets/js/app.1f287e75.js" defer></script>
+  </body>
+</html>
