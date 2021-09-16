@@ -27,6 +27,7 @@ module.exports = {
             text: 'Task',
             children: [
               '/kernel/task/idle.md',
+              '/kernel/task/thread_info.md'
             ]
           },
           {
@@ -105,6 +106,7 @@ module.exports = {
           {
             text: 'Misc',
             children: [
+              '/kernel/misc/rseq.md',
               '/kernel/misc/export_symbol.md',
               '/kernel/misc/uefi.md',
               '/kernel/misc/dtb.md',
@@ -140,6 +142,12 @@ module.exports = {
           '/qemu/pci.md'
         ]
       },
+      {
+        text: 'trusted computing',
+        children: [
+          '/trusted_computing/sgx.md',
+        ]
+      }
     ],
     sidebarDepth: 0,
     disableAllHeaders: true,
